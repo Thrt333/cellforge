@@ -1,0 +1,30 @@
+# Local secrets and configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Device-specific records, backups, captures and generated artifacts
+/backups/
+/artifacts/
+/private/
+/runtime/
+/.local/
+/third_party/
+*.pcap
+*.pcapng
+
+# Build output and local caches
+/build/
+/dist/
+.cache/
+__pycache__/
+*.py[cod]
+
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
