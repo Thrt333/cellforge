@@ -10,8 +10,8 @@ independent project and is not affiliated with DJI, Quectel, or any carrier.
 ## Current status
 
 This repository currently contains documentation and a verified hardware
-baseline. It does not yet contain an installer, a module service, a web dashboard,
-or a custom firmware image.
+baseline, plus a narrowly scoped macOS ECM configuration tool. It does not
+contain an installer, a module service, a web dashboard or a custom firmware image.
 
 On one QDC507 running `QDC507GLEFM21`, we have verified:
 
@@ -24,6 +24,19 @@ On one QDC507 running `QDC507GLEFM21`, we have verified:
 These observations apply to the tested device only. iPad compatibility, lock and
 wake behavior, power consumption, and long-term stability remain unverified.
 See [the hardware baseline](docs/hardware-baseline.md) for the evidence and limits.
+
+## ECM configuration tool
+
+Read the [usage guide](docs/ecm-tool.md) before changing a device.
+
+    python3 scripts/cellforge.py status
+    python3 scripts/cellforge.py enable-ecm
+    python3 scripts/cellforge.py disable-ecm
+
+The default is read-only. Changes require explicit confirmation, one mode write,
+readback and one restart request. Already in the target mode is a no-op.
+The tool does not wait for reconnection or verify networking. disable-ecm selects
+mode 0 (QMI); it does not turn off cellular service. Run host checks with `make check`.
 
 ## Intended use
 
