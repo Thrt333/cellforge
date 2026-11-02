@@ -209,6 +209,10 @@ class USB:
         }
         if cmd not in allowed or reset != (cmd == "AT+CFUN=1,1"):
             raise ToolError("AT command is outside the tool's allowlist.")
+        return self._exchange(cmd, reset)
+
+    def _exchange(self, cmd, reset=False):
+        """Shared transport; public command methods enforce their allowlists."""
         # Bound stale input draining; do not clear endpoints or change line state.
         deadline = time.monotonic() + 0.3
         while True:

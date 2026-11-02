@@ -1,5 +1,9 @@
 # Cellforge
 
+Version target: **1.0.0**, deployed preview on one module, not a published release.
+See the [connection maintenance design](docs/connection-maintenance.md) for the
+specified service, dashboard, LED contract, implementation and release gates.
+
 Minimal tooling for cellular modules, starting with the DJI first-generation 4G
 dongle (Baiwang QDC507).
 
@@ -9,9 +13,38 @@ project and is not affiliated with DJI, Quectel, or any carrier.
 
 ## Current status
 
-This repository currently contains documentation and a verified hardware baseline,
-plus a narrowly scoped macOS ECM configuration tool. It does not contain an
-installer, a module service, a web dashboard or a custom firmware image.
+The tested module now runs a supervised connection/LED/accounting service and USB-LAN
+dashboard, installed within the factory firmware. No custom firmware image is
+flashed. The host tools provide narrow ECM configuration, read-only inspection,
+bounded ADB authorization, versioned staging and startup control. The host Python
+policy remains a reference; the device runs shell/awk.
+
+Connect the module and open **http://192.168.225.1:8080/**. The service starts
+automatically after boot. See the [service guide](docs/module-service.md) for
+behavior, installed paths, stop/start, handback and evidence limits.
+
+Host policy tests pass; see the [1.0.0 verification
+record](docs/cellforge-1.0.0-validation.md). An initial ADB-bit attempt failed exact
+readback without a restart. The subsequent [legacy authorization
+transaction](docs/legacy-adb-transaction.md) succeeded on this unit: exact
+post-restart USB composition and real ADB root access were verified. See the [module
+runtime baseline](docs/module-runtime-baseline.md). Deployment, independent crash
+cleanup and restart/autostart were verified on this unit. Locked-mobile connectivity,
+visual yellow output and sustained resource impact remain pending; they are not
+implied by a healthy dashboard or blue LED.
+
+    make check-policy
+    make check-access
+    make check-probe
+    make check-authorization
+    make check-adb
+    make check-module
+    make check-module-assets
+    make check
+    make check-workspace
+    make check-diff
+
+Explicit read-only hardware inspection: `make probe-module`.
 
 On one QDC507 running `QDC507GLEFM21`, we have verified:
 
@@ -24,6 +57,10 @@ On one QDC507 running `QDC507GLEFM21`, we have verified:
 These observations apply to the tested device only. iPad compatibility, lock and wake
 behavior, power consumption, and long-term stability remain unverified. See [the
 hardware baseline](docs/hardware-baseline.md) for the evidence and limits.
+
+Subsequent field reports described working iPad/iPhone access and loss of networking
+after a locked interval while the module LED remained green. This is field-reported
+evidence; model/OS details and controlled lock-screen validation are pending.
 
 ## ECM configuration tool
 
@@ -54,12 +91,11 @@ The iPadOS versions have not yet been recorded.
 ## Direction
 
 1. Preserve the working factory firmware and CDC ECM connection.
-2. Validate both iPads before adding module-side software.
-3. Investigate a small read-only module-local dashboard for data usage and
-   upload/download rates.
-4. Confirm shell access, writable storage, resource limits and recovery before
-   deploying any service.
-5. Add keepalive behavior only if a reproduced problem demonstrates a need.
+2. Validate the deployed preview on the intended iPads and iPhones, with recorded
+   OS versions and separate screen-off/unlock-recovery criteria.
+3. Measure resource use, accounting continuity and factory handback during
+   repeated connection and lock cycles.
+4. Tune connection maintenance from those observations before release.
 
 The first version excludes SMS, calls, eSIM management and a resident Mac management
 application. There is no decision to fork the full DJOneHub platform.
