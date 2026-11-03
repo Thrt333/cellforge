@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: check check-policy check-access check-probe check-authorization check-adb check-module check-module-syntax check-module-assets check-workspace check-diff probe-module
+.PHONY: check check-policy check-access check-probe check-authorization check-adb check-module check-module-syntax check-module-assets check-recovery check-enable-trial check-auto-recovery check-workspace check-diff probe-module
 check:
 	$(PYTHON) -m unittest discover -s tests -v
 
@@ -26,6 +26,20 @@ check-module: check-module-syntax
 check-module-syntax:
 	sh -n module/cellforge.sh
 	sh -n module/startup.sh
+	sh -n module/usb-recover.sh
+	sh -n module/enable-trial.sh
+	sh -n module/auto-recover.sh
+	sh -n module/recovery-worker.sh
+
+check-recovery: check-module-syntax
+	$(PYTHON) -m unittest discover -s tests -p 'test_recovery_journal.py' -v
+
+check-enable-trial: check-module-syntax
+	$(PYTHON) -m unittest discover -s tests -p 'test_enable_trial.py' -v
+
+check-auto-recovery: check-module-syntax
+	$(PYTHON) -m unittest discover -s tests -p 'test_auto_recovery.py' -v
+	$(PYTHON) -m unittest discover -s tests -p 'test_module_policy.py' -v
 
 check-module-assets:
 	$(PYTHON) scripts/check_module_assets.py

@@ -19,6 +19,11 @@ flashed. The host tools provide narrow ECM configuration, read-only inspection,
 bounded ADB authorization, versioned staging and startup control. The host Python
 policy remains a reference; the device runs shell/awk.
 
+The preview now includes bounded automatic USB recovery using the successfully
+trialed factory Android USB enable path. Its trigger/budget/accounting rules and live
+deployment evidence are in [automatic recovery](docs/automatic-recovery.md). Normal
+operation is verified; real system-sleep and mobile acceptance are pending.
+
 Connect the module and open **http://192.168.225.1:8080/**. The service starts
 automatically after boot. See the [service guide](docs/module-service.md) for
 behavior, installed paths, stop/start, handback and evidence limits.

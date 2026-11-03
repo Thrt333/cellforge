@@ -10,6 +10,7 @@ FLAG=/tmp/factory_led_test
 FACTORY_HASH=8cad1634758bb373c61536e36436dd0972e75cfe5ad977b8fe8ab1d6464bb6b9
 TOKEN=${2:-}
 GEN=$RUN/control/$TOKEN
+. "$BASE/recovery-worker.sh"
 clock() { read -r uptime rest < /proc/uptime; echo "${uptime%%.*}"; }
 start_time() { awk '{print $22}' "/proc/$1/stat" 2>/dev/null; }
 record() { printf '%s %s\n' "$1" "$(start_time "$1")" > "$GEN/$2.pid"; }
@@ -37,6 +38,12 @@ release_wake() {
     fi
 }
 cleanup() {
+    if test -f "$AUTO/current"; then
+        number=$(cat "$AUTO/current")
+        case "$number" in 1|2|3)
+            if test "$(cat "$AUTO/action$number/token" 2>/dev/null)" = "$TOKEN"; then : > "$AUTO/action$number/cancel"; fi
+        ;; esac
+    fi
     for child in worker led httpd; do stop_child "$child"; done
     restore_led
     release_wake
@@ -58,11 +65,13 @@ snapshot() {
     asleep=$(cat "$USB/usb_sleep" 2>/dev/null || echo none)
     case "$asleep" in 0|1) ;; *) asleep=none;; esac
     owned=0; owns_led && owned=1
+    auto_step || return 1
     {
         printf 'now %s\ntx %s\nrx %s\nepoch %s\n' "$now" "$tx" "$rx" "$epoch"
         printf 'usb %s\nsleep %s\nsim %s\nradio %s\nrssi %s\nradio_alarm %s\n' "$usb" "$asleep" "$sim" "$radio" "$rssi" "$radio_alarm"
         printf 'host_at %s\nuplink_at %s\nprobing %s\nattempts %s\n' "$host_at" "$uplink_at" "$probing" "$attempts"
         printf 'host_ip %s\ncell_ip %s\nlast_recovery %s\nled_owned %s\n' "$host_ip" "$cell_ip" "$last_recovery" "$owned"
+        printf 'recovery_mode %s\nrecovery_reason %s\nrecovery_owned %s\n' "$auto_mode" "$auto_reason" "$recovery_owned"
     } > "$GEN/observation"
     awk -v state_out="$GEN/policy.new" -v led_out="$GEN/led.new" -f "$BASE/policy.awk" "$GEN/policy.state" "$GEN/observation" > "$RUN/www/status.new" || return 1
     mv "$GEN/policy.new" "$GEN/policy.state"
@@ -101,44 +110,50 @@ factory_state() {
 worker() {
     exec 9>&-
     host_at=0; uplink_at=0; attempts=0; probing=0; host_ip=; last_recovery=none
+    cached_peer=; peer_known=0; probe_seq=0; probe_result=missing; sleep_probes=0; previous_sleep=none
     sim=none; radio=none; rssi=none; radio_alarm=none
     factory_pid=; factory_start=; factory_base=; due=0
+    auto_init
     : > "$GEN/policy.state"
     while :; do
         heartbeat
         now=$(clock)
         usb=$(cat "$USB/state" 2>/dev/null || echo UNKNOWN)
         asleep=$(cat "$USB/usb_sleep" 2>/dev/null || echo none)
+        auto_read
+        if test "$previous_sleep" = 1 && test "$asleep" = 0; then sleep_probes=0; fi
+        previous_sleep=$asleep
         if test "$usb" = CONFIGURED; then
             if ! test -f "$GEN/wakelock"; then
                 printf '%s\n' "cellforge_$TOKEN" > /sys/power/wake_lock || exit 1
                 : > "$GEN/wakelock"
             fi
         else
-            release_wake; host_at=0; uplink_at=0; attempts=0
+            release_wake; host_at=0; uplink_at=0; host_ip=
+            if test "$auto_busy" = 0; then cached_peer=; peer_known=0; probe_result=missing; fi
         fi
         if test "$now" -ge "$due"; then
             factory_state
             if test "$usb" = CONFIGURED; then
-                if test "$asleep" != 1 || test "$attempts" -lt 3; then
-                    if test "$asleep" = 1 || test "$host_at" = 0; then probing=1; snapshot || exit 1; fi
-                    if test "$asleep" = 1; then attempts=$((attempts + 1)); last_recovery=usb_host_probe; fi
-                    candidates=$(awk '$6=="bridge0" && $3=="0x2" && $1 ~ /^192\.168\.225\.[0-9]+$/ && $1!="192.168.225.1" {print $1}' /proc/net/arp | head -n 2)
+                probe_result=missing
+                if test "$asleep" = 0 || { test "$asleep" = 1 && test "$sleep_probes" -lt 3; }; then
+                    candidates=$(awk -v cached="$cached_peer" -f "$BASE/peers.awk" /proc/net/arp)
                     host_at=0
+                    if test -n "$candidates"; then
+                        probe_seq=$((probe_seq + 1)); probe_result=fail; peer_known=1
+                        if test "$asleep" = 1; then sleep_probes=$((sleep_probes + 1)); fi
+                    else peer_known=0; fi
                     for peer in $candidates; do
                         if timeout -t 2 arping -c 1 -w 1 -I bridge0 "$peer" >/dev/null 2>&1; then
-                            host_ip=$peer; host_at=$(clock); break
+                            host_ip=$peer; host_at=$(clock); cached_peer=$peer; probe_result=ok; break
                         fi
                     done
-                    probing=0
-                    if test "$host_at" != 0 && test "$asleep" = 1; then last_recovery=host_responded; fi
                 fi
                 cell_if=$(ip route show 2>/dev/null | awk '$1=="default" {for(i=1;i<NF;i++) if($i=="dev") print $(i+1);exit}')
                 uplink_at=0
                 case "$cell_if" in rmnet_data[0-9])
                     if timeout -t 2 ping -I "$cell_if" -c 1 -w 1 1.1.1.1 >/dev/null 2>&1; then uplink_at=$(clock); fi
                 ;; esac
-                if test "$host_at" != 0 && test "$uplink_at" != 0 && test "$(cat "$USB/usb_sleep")" = 0; then attempts=0; fi
             fi
             due=$(($(clock) + 15))
         fi

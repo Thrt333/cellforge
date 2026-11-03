@@ -74,3 +74,23 @@ class DevicePolicyTests(unittest.TestCase):
         new_session = self.sample(now=108)
         self.assertEqual(new_session["download_bytes"], 0)
         self.assertEqual(new_session["session_seconds"], 0)
+
+    def test_owned_recovery_preserves_session_and_marks_uncertainty(self):
+        self.sample()
+        self.sample(now=101, tx=1200, rx=2400)
+        self.sample(now=102, tx=1200, rx=2400, recovery_owned=1, recovery_mode="recovering", host_at=0)
+        during = self.sample(now=110, usb="DISCONNECTED", recovery_owned=1,
+                             recovery_mode="recovering", tx=1400, rx=2800, host_at=0)
+        self.assertEqual(during["download_bytes"], 800)
+        self.assertTrue(during["session_uncertain"])
+        self.assertIsNone(during["download_Bps"])
+        after = self.sample(now=115, recovery_owned=0, host_at=115, uplink_at=115,
+                            tx=1500, rx=3000, recovery_mode="cooldown")
+        self.assertEqual(after["download_bytes"], 1000)
+        self.assertEqual(after["session_seconds"], 15)
+        self.assertFalse(after["session_uncertain"])
+        self.assertEqual(after["discontinuities"], 1)
+
+    def test_recovery_confirmation_cannot_use_old_blue_evidence(self):
+        self.assertEqual(self.sample(recovery_owned=1, recovery_mode="confirming")["led"], "blue_blink")
+        self.assertEqual(self.sample(sim=0, recovery_owned=1, recovery_mode="recovering")["led"], "red_solid")

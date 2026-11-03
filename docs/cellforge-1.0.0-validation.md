@@ -3,6 +3,18 @@
 Date: 2026-11-02. Version target: 1.0.0, not released. Branch:
 `feature/cellforge-1.0.0`, based on `2abdb34`.
 
+Later sleep/resume failure and disabled trial/evidence preparation are recorded in
+[the recovery investigation](usb-recovery-investigation.md). Automatic USB resume
+recovery is not fixed; the deployed preview remains unchanged. One bounded
+android0/enable capability trial subsequently passed without manual unplug; see its
+[result](usb-enable-trial-plan.md#execution-result). It does not establish automatic
+sleep recovery or mobile acceptance.
+
+2026-11-03: the automatic state machine/executor was implemented and deployed as
+release `de31653675b5a757`, with 102 tests passing and healthy live normal operation.
+See [automatic recovery](automatic-recovery.md) for precise evidence and limits. Real
+system-sleep acceptance remains pending.
+
 The later service deployment, startup repair and actual device outcomes are recorded
 in [the module service guide](module-service.md). The host checks below describe the
 earlier access/policy stage; they were not all repeated for the one-line startup

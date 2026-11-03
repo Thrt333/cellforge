@@ -16,7 +16,7 @@ else:
 
 
 ROOT = Path(__file__).resolve().parent.parent
-FILES = ("cellforge.sh", "policy.awk", "httpd.conf", "web/index.html")
+FILES = ("cellforge.sh", "policy.awk", "recovery.awk", "recovery-worker.sh", "auto-recover.sh", "peers.awk", "httpd.conf", "web/index.html")
 REMOTE = "/data/cellforge"
 INIT_PATH = "/etc/init.d/cellforge"
 BOOT_LINKS = ("/etc/rc5.d/S99cellforge", "/etc/rc0.d/K01cellforge", "/etc/rc6.d/K01cellforge")
@@ -48,6 +48,7 @@ def stage(dev):
     revision, files = package()
     target = REMOTE + "/releases/" + revision
     run(dev, "test ! -f /tmp/cellforge/current")
+    run(dev, "test ! -f /tmp/cellforge/auto/current")
     run(dev, "set -e; mkdir -p " + target + "/web; chmod 700 " + REMOTE + " " + REMOTE + "/releases " + target)
     manifest = {}
     for name, value in files.items():
@@ -63,7 +64,8 @@ def stage(dev):
             raise adb.ecm.ToolError("Staged file hash mismatch; not activating")
         run(dev, "chmod 600 " + destination + ".new; mv " + destination + ".new " + destination)
         manifest[name] = expected
-    run(dev, "sh -n " + target + "/cellforge.sh")
+    for name in ("cellforge.sh", "recovery-worker.sh", "auto-recover.sh"):
+        run(dev, "sh -n " + target + "/" + name)
     # A running service must be stopped explicitly before changing its files.
     run(dev, "test ! -f /tmp/cellforge/current && ln -sfn releases/" + revision + " " + REMOTE + "/current")
     return {"revision": revision, "path": target, "files": manifest}

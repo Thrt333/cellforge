@@ -3,6 +3,11 @@
 Status: deployed preview on the tested QDC507, not a published release or a completed
 mobile lock-screen acceptance. No custom firmware image is flashed.
 
+2026-11-03 update: automatic USB recovery is implemented and running in release
+`de31653675b5a757`. The [automatic recovery contract](automatic-recovery.md)
+supersedes the earlier probe-only maintenance behavior recorded below. Actual
+sleep/resume acceptance was pending at this deployment stage.
+
 ## Use
 
 Connect the module to the device, wait for its USB Ethernet connection, then open:
