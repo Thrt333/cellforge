@@ -5,6 +5,13 @@ composition retained. The successful awake-Mac enable trial establishes a candid
 action, not sleep acceptance. No host program/dashboard is required by the automatic
 design.
 
+2026-11-06 release update: field reports describe one successful iPad lock/unlock
+recovery, stable long-term use, normal LEDs and manual unplug/reconnect. This cycle
+was not correlated with the automatic event journal, so it does not prove the
+production USB-reset branch was exercised. Mac actual system-sleep and
+repeated/multiple-device acceptance are explicitly deferred under the specified 1.0.0
+scope. See [the current validation record](cellforge-1.0.0-validation.md).
+
 | Observation | Decision |
 | --- | --- |
 | No previous healthy connection | checking; no reset |
@@ -131,12 +138,16 @@ rewritten for this deployment.
   for supervisor/worker/LED/httpd; these are not isolated private-memory totals
   or sustained peak measurements during automatic recovery.
 
-Actual system sleep was not tested. No sleep acceptance is claimed, no production
-automatic USB cycle has been hardware-exercised yet, and the previous one-cycle
-awake-Mac trial remains the action-capability evidence. Still pending: real automatic
+At the 2026-11-03 deployment checkpoint, actual system sleep was not tested. No sleep
+acceptance was claimed then; no production automatic USB cycle had been
+hardware-exercised, and the previous one-cycle awake-Mac trial remained the
+action-capability evidence. The pending list at that checkpoint was: real automatic
 trigger and recovery after system sleep, abnormal executor cleanup on hardware,
 repeated incidents/boot budget, iPad/iPhone behavior, long-duration operation and
 sustained power/thermal impact.
+
+The 2026-11-06 field report at the top adds stable use and one iPad recovery;
+unobserved experiments remain limitations.
 
 For acceptance, let the Mac enter actual system sleep (not only screen lock), wake it
 without unplugging the module, and allow grace plus distinct probe rounds and

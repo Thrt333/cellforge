@@ -1,8 +1,9 @@
 # Cellforge
 
-Version target: **1.0.0**, deployed preview on one module, not a published release.
-See the [connection maintenance design](docs/connection-maintenance.md) for the
-specified service, dashboard, LED contract, implementation and release gates.
+Version: **1.0.0**. Delivery: version tag + GitHub Release + source installation. See
+the [installation guide](docs/install.md), [changelog](CHANGELOG.md) and [source
+verification](docs/install.md#verify-a-source-checkout). No separate installer
+package or custom firmware image is provided.
 
 Minimal tooling for cellular modules, starting with the DJI first-generation 4G
 dongle (Baiwang QDC507).
@@ -19,10 +20,14 @@ flashed. The host tools provide narrow ECM configuration, read-only inspection,
 bounded ADB authorization, versioned staging and startup control. The host Python
 policy remains a reference; the device runs shell/awk.
 
-The preview now includes bounded automatic USB recovery using the successfully
-trialed factory Android USB enable path. Its trigger/budget/accounting rules and live
-deployment evidence are in [automatic recovery](docs/automatic-recovery.md). Normal
-operation is verified; real system-sleep and mobile acceptance are pending.
+The service includes bounded automatic USB recovery using the successfully trialed
+factory Android USB enable path. Its trigger/budget/accounting rules and live
+deployment evidence are in [automatic recovery](docs/automatic-recovery.md). Field
+reports describe one successful iPad lock/unlock recovery, stable long-term use,
+normal LEDs and normal manual unplug/reconnect. Mac actual system-sleep recovery and
+repeated/multiple-device acceptance are deferred beyond the current evidence. An iPad
+recovery success does not establish continuous screen-off internet or prove that the
+automatic USB-reset branch was used.
 
 Connect the module and open **http://192.168.225.1:8080/**. The service starts
 automatically after boot. See the [service guide](docs/module-service.md) for
@@ -34,17 +39,25 @@ readback without a restart. The subsequent [legacy authorization
 transaction](docs/legacy-adb-transaction.md) succeeded on this unit: exact
 post-restart USB composition and real ADB root access were verified. See the [module
 runtime baseline](docs/module-runtime-baseline.md). Deployment, independent crash
-cleanup and restart/autostart were verified on this unit. Locked-mobile connectivity,
-visual yellow output and sustained resource impact remain pending; they are not
-implied by a healthy dashboard or blue LED.
+cleanup and restart/autostart were verified on this unit. Field-reported stable
+operation is not a quantified power/thermal benchmark. Hardware fault-injection,
+complete uninstall and universal phone compatibility are not claimed. See the
+validation record for the current evidence boundary.
 
-    make check-policy
-    make check-access
-    make check-probe
-    make check-authorization
-    make check-adb
-    make check-module
-    make check-module-assets
+## Source installation
+
+Follow [the installation guide](docs/install.md) from the `v1.0.0` source.
+Installation uses a Mac as the USB control host, with Python, existing libusb, the
+exact supported firmware, ECM and root ADB access. It does not install a resident Mac
+application. Once installed, the module works independently. Fresh installation on
+another user's module has not been acceptance-tested.
+
+## Software checks
+
+During development, run the affected target. The verification sequence is in [source
+verification](docs/install.md#verify-a-source-checkout):
+
+    make check-module-syntax check-module-assets
     make check
     make check-workspace
     make check-diff
@@ -59,13 +72,14 @@ On one QDC507 running `QDC507GLEFM21`, we have verified:
 - HTTPS access explicitly bound to that adapter succeeds with Wi-Fi disabled.
 - The module answers native sent/received-byte counter queries.
 
-These observations apply to the tested device only. iPad compatibility, lock and wake
-behavior, power consumption, and long-term stability remain unverified. See [the
+These instrumented observations apply to the tested module only. The later
+field-reported mobile results are recorded separately from controlled tests. See [the
 hardware baseline](docs/hardware-baseline.md) for the evidence and limits.
 
-Subsequent field reports described working iPad/iPhone access and loss of networking
-after a locked interval while the module LED remained green. This is field-reported
-evidence; model/OS details and controlled lock-screen validation are pending.
+Earlier field reports described working iPad/iPhone access but loss of networking
+after locking while the LED stayed green. The bounded recovery implementation and
+later single iPad success followed that report; model/OS details and broad
+lock-screen acceptance have not been recorded.
 
 ## ECM configuration tool
 
@@ -86,24 +100,32 @@ The iPad connects to the dongle over USB; the dongle connects to the carrier ove
 LTE. The iPad sees an Ethernet connection rather than gaining native iPadOS cellular
 hardware or settings.
 
-Target devices for upcoming validation:
+Previously identified candidate devices for further validation:
 
 - iPad mini (A17 Pro), commonly called iPad mini 7.
 - iPad Pro 12.9-inch (2020).
 
-The iPadOS versions have not yet been recorded.
+The iPadOS versions have not yet been recorded. The single reported lock/unlock
+success has not been tied to either candidate model, so neither is listed as a fully
+tested model/OS combination.
 
 ## Direction
 
 1. Preserve the working factory firmware and CDC ECM connection.
-2. Validate the deployed preview on the intended iPads and iPhones, with recorded
+2. Extend validation on the intended iPads and iPhones, with recorded
    OS versions and separate screen-off/unlock-recovery criteria.
 3. Measure resource use, accounting continuity and factory handback during
    repeated connection and lock cycles.
-4. Tune connection maintenance from those observations before release.
+4. Revisit Mac actual system-sleep recovery and remaining hardware evidence in
+   later work; design the dashboard traffic switch for 1.1.0 separately.
 
 The first version excludes SMS, calls, eSIM management and a resident Mac management
 application. There is no decision to fork the full DJOneHub platform.
+
+## Source permissions
+
+License selection is deferred. This repository publishes source without granting an
+open-source license; publication and a GitHub Release are not a license grant.
 
 ## References
 

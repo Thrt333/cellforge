@@ -1,11 +1,49 @@
 # Cellforge 1.0.0 implementation verification
 
-Date: 2026-11-02. Version target: 1.0.0, not released. Branch:
+Initial record: 2026-11-02. Release scope updated: 2026-11-06, version 1.0.0. Branch:
 `feature/cellforge-1.0.0`, based on `2abdb34`.
 
-Later sleep/resume failure and disabled trial/evidence preparation are recorded in
-[the recovery investigation](usb-recovery-investigation.md). Automatic USB resume
-recovery is not fixed; the deployed preview remains unchanged. One bounded
+The dated checkpoints below preserve earlier evidence; later outcomes supersede
+earlier "pending" status. For publication follow [source
+verification](install.md#verify-a-source-checkout).
+
+## Current 1.0.0 evidence - 2026-11-06
+
+The following evidence and limitations apply to 1.0.0:
+
+| Area | Evidence and disposition |
+| --- | --- |
+| iPad lock/unlock recovery | Field reports describe one successful cycle; not repeated across devices |
+| Manual unplug/reconnect | Field reports describe normal disconnect/reconnect behavior |
+| LEDs | Field reports describe normal appearance |
+| Long-term use | Field reports describe stable operation; no measured duration or power/thermal criteria supplied |
+| Abnormal recovery | No symptom reported; hardware fault-injection and budget exhaustion not exercised |
+| Mac actual system sleep | Not tested; explicitly deferred to a later version |
+
+Device model, iPadOS version, lock duration and recovery-event correlation were not
+supplied for the successful iPad cycle. It is valid field-reported functional
+evidence, not proof that the production USB enable cycle ran or that networking
+remained active throughout screen-off. Multiple devices/cycles, continuous screen-off
+traffic, quantified power/thermal impact and complete uninstall/debug reversal are
+not claimed. Manual unplugging is not an automatic recovery test.
+
+These results are limited observations. Deferred experiments remain untested, and
+absence of a reported symptom is not a passed experiment. The dashboard Wi-Fi/module
+traffic switch is reserved for 1.1.0.
+
+The 1.0.0 service payload remains `de31653675b5a757`; release preparation changes
+documentation only. Source installation is documented in [install.md](install.md)
+using the existing tools. It was not re-executed on a new module during release
+preparation. No additional package is built; no license is included.
+
+The GitHub Release notes record the exact source SHA, software-check commands and
+results. Software checks do not establish hardware acceptance.
+
+## Earlier investigation and implementation checkpoints
+
+Sleep/resume failure and disabled trial/evidence preparation were recorded in [the
+recovery investigation](usb-recovery-investigation.md). At that earlier checkpoint
+automatic recovery was not implemented and the preview was unchanged. One bounded
 android0/enable capability trial subsequently passed without manual unplug; see its
 [result](usb-enable-trial-plan.md#execution-result). It does not establish automatic
 sleep recovery or mobile acceptance.
@@ -13,7 +51,7 @@ sleep recovery or mobile acceptance.
 2026-11-03: the automatic state machine/executor was implemented and deployed as
 release `de31653675b5a757`, with 102 tests passing and healthy live normal operation.
 See [automatic recovery](automatic-recovery.md) for precise evidence and limits. Real
-system-sleep acceptance remains pending.
+Mac system-sleep acceptance remains deferred.
 
 The later service deployment, startup repair and actual device outcomes are recorded
 in [the module service guide](module-service.md). The host checks below describe the
@@ -115,7 +153,7 @@ No device write, restart or repeat hardware test was performed for this commit. 
 service guide includes the subsequent live storage/RAM snapshot. This is a
 source/deployment checkpoint; the acceptance items below remain open.
 
-## Pending device acceptance
+## Original pending device acceptance (before the 2026-11-06 field report)
 
 - Verify actual phone-side USB sleep/resume and host response to maintenance traffic.
 - Visually confirm yellow and blink appearance; electrical mapping and crash handback
@@ -124,7 +162,8 @@ source/deployment checkpoint; the acceptance items below remain open.
 - Complete real-device lock/unlock, screen-off traffic, repeated recovery,
   accounting, yellow LED, power/thermal, startup-removal and long-duration validation.
 
-the field report of working mobile internet is retained separately from controlled
-acceptance. This implementation is being committed as a deployed preview; version
-1.0.0 is the target, not a completed release. No release tag, push or publication is
-included. iPad lock-screen acceptance was pending at this stage.
+At that earlier checkpoint, the field report of working mobile internet was retained
+separately from controlled acceptance. Those implementation commits were
+deployed-preview checkpoints and did not create a release tag. The current evidence
+summary above includes the later iPad field result; this historical pending list is
+not the current evidence summary.

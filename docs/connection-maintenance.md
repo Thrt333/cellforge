@@ -1,10 +1,12 @@
 # Cellforge 1.0.0 design and implementation gates
 
-Status: implementation in progress, not a released or device-validated firmware. The
-version target is stored in `VERSION`; no release tag is created by this work. The
-module service is now deployed as a preview on the tested unit; see [the
-implementation and device evidence](module-service.md). The design below is the
-acceptance contract, not a claim that mobile lock-screen validation passed.
+Status: 1.0.0 implementation and original design history. The version is stored in
+`VERSION`. Current behavior is in [the service guide](module-service.md) and
+[automatic recovery](automatic-recovery.md); the 2026-11-06 release scope and
+field-reported acceptance are in [the validation
+record](cellforge-1.0.0-validation.md). The prototype and inspection statements below
+are historical. Later implementation and current evidence supersede the earlier
+deployment status.
 
 ## Outcome and delivery
 
@@ -16,15 +18,15 @@ continuous screen-off internet.
 Prefer a service within the factory firmware. Kernel changes or a replacement
 firmware require a separate implementation and recovery decision. There is no module
 SDK, cross-build sysroot, firmware image or proven flash recovery in this repository.
-Neither Python nor any other service runtime has been verified on this particular
-module.
+The initial runtime uncertainty was resolved by inspecting and using the factory
+shell/awk/BusyBox; Python remains a host tool, not a module runtime.
 
 `cellforge/policy.py` is a hardware-independent executable policy prototype, tested
 on host Python 3.9+. It issues action intents but performs no I/O and cannot keep a
-phone connected, drive an LED or reset a module. Target runtime selection and
-hardware adapters follow inspection of the actual device.
+phone connected, drive an LED or reset a module. It remains a reference prototype;
+the deployed shell/awk adapter is documented separately.
 
-## Evidence and observation boundary
+## Initial evidence and observation boundary (historical)
 
 - Field reports describe working iPad and iPhone internet access before locking, then
   failures after some locked interval even though the LED remains green. Device
@@ -63,18 +65,23 @@ A missing observation must not be converted into a negative one.
 | not_applicable | Confirmed no attached device | Display known radio state; stop recovery and release resources |
 | cutoff | Success evidence expired, or predates a detach/fault/suspend | Recheck; prior blue indication lasts only a bounded grace period |
 
-The prototype uses 30 seconds evidence TTL, a 5 second check grace, a 5 second action
-deadline, 15 seconds between wakeup attempts, and at most 3 attempts. These are
-testable prototype parameters, not validated device tuning or the final release
-contract. The attempt budget resets on confirmed healthy state or confirmed detach,
-not simply because an elapsed timer starts a new cycle.
+The host reference prototype uses 30 seconds evidence TTL, a 5 second check grace, a
+5 second action deadline, 15 seconds between wakeup attempts, and at most 3 attempts.
+These are testable prototype parameters, not validated device tuning or the final
+release contract. The attempt budget resets on confirmed healthy state or confirmed
+detach, not simply because an elapsed timer starts a new cycle.
 
 After suspend or a definite fault, require fresh evidence from after the event. A
 successful wakeup dispatch is not proof that the device resumed. Each intent has a
 unique token and deadline; a late or duplicate completion is ignored. No successful
 evidence means no permanent blue solid indication.
 
-## Maintenance and recovery
+## Original maintenance and recovery proposal
+
+The table below describes the reference prototype. The deployed bounded USB enable
+executor and its different trigger/budget rules are authoritative in [automatic
+recovery](automatic-recovery.md); do not apply prototype retries to the production
+executor.
 
 One coordinator owns all AT, USB, cellular and LED operations. Observers and
 dashboard consumers cannot perform mutations or compete for control channels.
@@ -161,10 +168,12 @@ totals are incomplete, not exactly measured. The prototype accumulator is in mem
 and does not yet implement a session manager or persistence; process restart does not
 preserve its totals.
 
-The future HTTP server must bind only to a verified USB LAN address/interface, never
+The HTTP server must bind only to a verified USB LAN address/interface, never
 wildcard or cellular WAN, and refuse to start if isolation is uncertain. Keep factory
 DHCP, DNS, NAT and routing ownership intact. Inspect actual listeners before
-selecting a port; no listener or HTTP server is installed yet.
+selecting a port. The deployed server binds `192.168.225.1:8080` and exposes
+read-only dashboard data. 1.1.0 traffic switching requires its own review of any
+change to factory network ownership; it is not part of this release.
 
 ## Deployment and rollback
 
@@ -194,7 +203,10 @@ The separately gated access helper and exact transaction are documented in [the 
 access procedure](legacy-adb-transaction.md). Preparing that helper does not
 authorize executing a composition write or restart.
 
-| Layer | Required evidence |
+The following is the comprehensive acceptance target. Uncompleted items remain
+disclosed limitations, not passed experiments.
+
+| Layer | Original target evidence |
 | --- | --- |
 | Policy fixtures | Evidence cutoff, future/missing samples, red priority, radio/strength matrix, retry ceiling, timeout, stale completion, counter gaps/resets |
 | Module adapter | Actual runtime/ABI, supported probes and wakeup path, AT arbitration, yellow LED, factory handback, bounded resource consumption |
@@ -206,8 +218,13 @@ Before acceptance, fix the supported-device matrix and numeric pass criteria (lo
 duration, recovery deadline, repetitions and acceptable resource cost). Keep other
 network paths controlled so Wi-Fi or native cellular cannot mask a USB failure. Use
 independent traffic evidence for screen-off connectivity; an LED, ping dispatched by
-the module, or dashboard refresh alone is insufficient. These acceptance targets are
-not established by software fixtures alone.
+the module, or dashboard refresh alone is insufficient. The 1.0.0 field evidence
+consists of one reported iPad lock/unlock success, normal manual unplug/reconnect and
+LEDs, and stable use. Mac actual sleep and repeated/multiple-device acceptance remain
+untested. Continuous screen-off connectivity, hardware fault injection, quantitative
+power/thermal acceptance and full uninstall are not established. Follow [source
+verification](install.md#verify-a-source-checkout) for software verification,
+publication and accurate disclosure.
 
 ## Research references
 

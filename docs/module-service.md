@@ -1,12 +1,16 @@
 # Cellforge 1.0.0 module service
 
-Status: deployed preview on the tested QDC507, not a published release or a completed
-mobile lock-screen acceptance. No custom firmware image is flashed.
+Status: Cellforge 1.0.0 service on the tested QDC507. No custom firmware image is
+flashed. See [the release evidence](cellforge-1.0.0-validation.md) and [source
+installation](install.md) for supported scope and remaining limits.
 
 2026-11-03 update: automatic USB recovery is implemented and running in release
 `de31653675b5a757`. The [automatic recovery contract](automatic-recovery.md)
-supersedes the earlier probe-only maintenance behavior recorded below. Actual
-sleep/resume acceptance was pending at this deployment stage.
+supersedes the earlier probe-only maintenance behavior. Field reports recorded on
+2026-11-06 describe one successful iPad lock/unlock recovery, normal LEDs, stable
+long-term use and normal manual unplug/reconnect. Mac actual system-sleep and
+repeated mobile acceptance are deferred; no continuous screen-off internet is
+claimed.
 
 ## Use
 
@@ -48,8 +52,9 @@ For this exact binary, the RGB loop and logs support this mapping:
 The factory RGB loop checks `/tmp/factory_led_test` and pauses while it exists.
 Cellforge uses a unique ownership token in that flag. Other factory daemon
 responsibilities continue. Cellforge does not change GPIO direction or export unknown
-pins. Yellow drives the confirmed red and green channels together; visual appearance
-still needs visual observation.
+pins. Yellow drives the confirmed red and green channels together. The field reports
+recorded normal LED appearance on 2026-11-06; no per-pattern video or measured signal
+threshold acceptance record is implied.
 
 Only the following factory-state words are read relative to the verified ELF load
 base: generation/RSSI at `0x13008` (8 bytes), SIM at `0x132b4` (4 bytes), and radio
@@ -65,15 +70,17 @@ not a public vendor ABI or a claim of other-build support.
 - Resolve host candidates from complete USB-LAN ARP entries, never a guessed IP.
   Actively probe at most two candidates using ARP; probe the cellular outlet
   through its actual rmnet_data interface. Normal probe rounds are about 15 seconds.
-- During observed USB sleep, permit at most three host-probe recovery attempts.
-  Keep blue solid only with recent host and outlet evidence and a resumed bus.
-  USB-sleep budget exhaustion waits for host/bus recovery rather than rebooting.
+- During observed USB sleep, do not force USB resets. After resume or suspected
+  loss, use the observation grace and distinct actual host-probe failures defined
+  in [automatic recovery](automatic-recovery.md). Reserve at most one enable
+  cycle per incident and three per boot; keep collecting during execution.
 - Packet transmission may engage the factory USB controller's wake behavior.
   No claim that this can force iOS to keep USB active is made without mobile tests.
 - Do not write `android0/remote_wakeup` as if it triggered a wake request. Reference
   Android gadget code uses that attribute for wakeup advertisement; it was already
-  enabled on the device. No USB composition, PDP reset or reboot is issued by
-  the running service.
+  enabled on the device. The running service may briefly re-enumerate USB via
+  the specified bounded `android0/enable` cycle. It does not change USB composition,
+  reset PDP or reboot the module.
 
 The deployed command syntax is the verified BusyBox 1.23 form `timeout -t 2`. The
 service uses `/proc/net/arp`; that build's `ip` lacks the `neigh` subcommand.
@@ -102,12 +109,14 @@ shown by the browser rather than leaving a cached healthy label.
 
 ## Installed paths
 
-The active immutable payload is `/data/cellforge/releases/df1c05e2aa719e6c`, selected
-by `/data/cellforge/current`.
+The 1.0.0 immutable payload is `/data/cellforge/releases/de31653675b5a757`, selected
+by `/data/cellforge/current` in the last recorded deployment. The earlier payload
+`df1c05e2aa719e6c` belongs to the 2026-11-02 historical resource snapshot.
 
 Persistent data-owned files:
 
-- Each release contains `cellforge.sh`, `policy.awk`, `httpd.conf`, `web/index.html`.
+- Each payload contains `cellforge.sh`, `policy.awk`, `recovery.awk`,
+  `recovery-worker.sh`, `auto-recover.sh`, `peers.awk`, `httpd.conf`, `web/index.html`.
 - `/data/cellforge/startup.sh`: wait for USB LAN, launch asynchronously.
 - `/data/cellforge/init.sh`: retained copy of the owned init shim.
 - `/data/cellforge/autostart.enabled`: enables the startup hook.
@@ -130,7 +139,9 @@ traceability; they are not started in parallel and were not automatically delete
 
 ## Resource snapshot
 
-Read-only measurements on 2026-11-02, with the service running:
+Historical read-only measurements on 2026-11-02, before automatic recovery was added.
+These sizes are not the 1.0.0 payload sizes; the later 56 KiB payload and 2026-11-03
+RAM snapshot are in [automatic recovery](automatic-recovery.md):
 
 | Item | Observed size (KiB) |
 | --- | ---: |
@@ -186,13 +197,15 @@ revoke the separately accepted authorization or close its USB function.
   service without a host start command. The returned state was `active`,
   `blue_solid`, telemetry available, both connectivity evidence ages 10 seconds,
   and live cellular byte deltas. MAC/phone-independent startup is thus observed
-  on this unit; locked-mobile behavior is not yet acceptance-tested.
+  on this unit; this restart test did not establish locked-mobile behavior.
 - A direct Mac request to the dashboard returned HTTP 200 with the actual page.
 
-Pending mobile evidence: exact device/OS matrix, screen-off connectivity, unlock
-recovery, repeated lock cycles, visual yellow/blink appearance, sustained
-power/thermal impact and long-duration operation. The running preview is ready for
-those tests, but no release tag or general guarantee is issued.
+2026-11-06 field report: one iPad lock/unlock recovery succeeded, manual
+unplug/reconnect and LEDs are normal, and long-term use is stable. No device/OS
+matrix, lock duration or recovery-event correlation was supplied. Repeated cycles,
+continuous screen-off internet, quantified power/thermal impact and complete
+uninstall are not established. These are disclosed limits of the documented 1.0.0
+scope, rather than claims of completed broad acceptance.
 
 Reference for the wakeup attribute distinction: [Android gadget remote_wakeup
 implementation](https://android.googlesource.com/kernel/msm/+/911cc4cde9b6c237aed0b3427d1577b16b61ee54/drivers/usb/gadget/android.c).
