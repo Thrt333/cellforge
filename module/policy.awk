@@ -76,7 +76,7 @@ END {
     }
     if (host_age < 0) host_age = "null"
     if (uplink_age < 0) uplink_age = "null"
-    printf "{\"version\":\"1.0.0\",\"state\":\"%s\",\"led\":\"%s\",", state, led
+    printf "{\"version\":\"1.1.0\",\"state\":\"%s\",\"led\":\"%s\",", state, led
     printf "\"usb_state\":\"%s\",\"usb_sleep\":%s,\"updated_uptime\":%.0f,", obs["usb"], nullable(obs["sleep"]), now
     printf "\"local_ip\":\"192.168.225.1\",\"device_ip\":\"%s\",\"cellular_ip\":\"%s\",", obs["host_ip"], obs["cell_ip"]
     printf "\"network_type\":\"%s\",\"signal_dbm\":%s,\"host_age\":%s,\"uplink_age\":%s,", network, nullable(obs["rssi"]), host_age, uplink_age

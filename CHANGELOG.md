@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.1.0 - 2026-11-10
+
+### Dashboard interface optimization
+
+- Refresh the responsive Dashboard layout, connection indication, typography and
+  visual styling.
+- Keep upload/download speed alignment stable as values change, refine session
+  usage cards and compact device information.
+- Refine globe rendering, animation depth and color transitions without external
+  runtime assets or libraries.
+- Synchronize module and Dashboard version reporting at 1.1.0.
+
+### Deployment
+
+- Flush staged payload files before activation and flush the release selection
+  before reporting success. Synchronization failures stop staging without retry.
+- Retain the existing source installation and owned startup model.
+
+### Evidence and limits
+
+- Module payload: `630ff04b2567dd24`.
+- Exact source SHA, clean-checkout verification results and module observations are
+  recorded in the GitHub Release notes.
+- Network maintenance, accounting and LED behavior retain the 1.0.0 design.
+  Existing hardware acceptance limits still apply; no broader compatibility or
+  lock-screen acceptance is claimed.
+- Wi-Fi/module traffic selection remains deferred and is not included.
+- Tag + GitHub Release + source installation; no separate installer or firmware
+  package. License selection remains deferred.
+
 ## 1.0.0 - 2026-11-06
 
 ### Features
@@ -35,8 +65,7 @@
 - Tag + GitHub Release + source installation; no separate install package.
   License selection is deferred; no open-source license is granted by this release.
 
-## Planned 1.1.0
+## Deferred
 
-- Dashboard selection of Wi-Fi versus module internet, preserving USB management
-  connectivity and the user's last choice through recovery. Design only; not
-  implemented or included in 1.0.0.
+- Dashboard selection of Wi-Fi versus module internet remains design work and is
+  not included in 1.1.0.

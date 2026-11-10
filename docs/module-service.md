@@ -1,11 +1,14 @@
-# Cellforge 1.0.0 module service
+# Cellforge 1.1.0 module service
 
-Status: Cellforge 1.0.0 service on the tested QDC507. No custom firmware image is
-flashed. See [the release evidence](cellforge-1.0.0-validation.md) and [source
+Status: Cellforge 1.1.0 service on the tested QDC507. No custom firmware image is
+flashed. See [the release evidence](cellforge-1.1.0-validation.md) and [source
 installation](install.md) for supported scope and remaining limits.
 
-2026-11-03 update: automatic USB recovery is implemented and running in release
-`de31653675b5a757`. The [automatic recovery contract](automatic-recovery.md)
+The 1.1.0 release updates the Dashboard interface and source staging durability;
+network maintenance, accounting, startup and LED policy are retained.
+
+2026-11-03 historical update: automatic USB recovery was implemented and running in
+release `de31653675b5a757`. The [automatic recovery contract](automatic-recovery.md)
 supersedes the earlier probe-only maintenance behavior. Field reports recorded on
 2026-11-06 describe one successful iPad lock/unlock recovery, normal LEDs, stable
 long-term use and normal manual unplug/reconnect. Mac actual system-sleep and
@@ -109,8 +112,10 @@ shown by the browser rather than leaving a cached healthy label.
 
 ## Installed paths
 
-The 1.0.0 immutable payload is `/data/cellforge/releases/de31653675b5a757`, selected
-by `/data/cellforge/current` in the last recorded deployment. The earlier payload
+The 1.1.0 immutable payload is `/data/cellforge/releases/630ff04b2567dd24`,
+selected by `/data/cellforge/current`. Source staging flushes payload files before
+activation and flushes the selected link before reporting success. The published
+1.0.0 payload remains `de31653675b5a757`. The earlier payload
 `df1c05e2aa719e6c` belongs to the 2026-11-02 historical resource snapshot.
 
 Persistent data-owned files:

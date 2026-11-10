@@ -32,6 +32,7 @@ class DevicePolicyTests(unittest.TestCase):
 
     def test_actual_fresh_evidence_and_traffic_delta(self):
         first = self.sample()
+        self.assertEqual(first["version"], (ROOT / "VERSION").read_text().strip())
         self.assertEqual(first["led"], "blue_solid")
         self.assertIsNone(first["upload_Bps"])
         next_sample = self.sample(now=102, tx=1200, rx=2600)

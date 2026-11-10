@@ -111,7 +111,7 @@ def healthy(data):
     if not isinstance(data, dict):
         return False
     if (data.get("version"), data.get("state"), data.get("usb_state"), data.get("usb_sleep")) != (
-            "1.0.0", "active", "CONFIGURED", 0):
+            "1.1.0", "active", "CONFIGURED", 0):
         return False
     for key in ("updated_uptime", "host_age", "uplink_age"):
         value = data.get(key)

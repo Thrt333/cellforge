@@ -36,11 +36,12 @@ class HostTrialTests(unittest.TestCase):
             trial.usb_interface("Hardware Port: Baiwang\nDevice: en7\nHardware Port: Baiwang\nDevice: en8\n")
 
     def test_stale_missing_and_wrong_state_never_count_as_healthy(self):
-        data = dict(version="1.0.0", state="active", usb_state="CONFIGURED", usb_sleep=0,
+        data = dict(version="1.1.0", state="active", usb_state="CONFIGURED", usb_sleep=0,
                     updated_uptime=100, host_age=1, uplink_age=2)
         self.assertTrue(trial.healthy(data))
         for change in ({"host_age": None}, {"host_age": 31}, {"usb_sleep": 1},
-                       {"state": "limited"}, {"updated_uptime": True}, {"uplink_age": -1}):
+                       {"state": "limited"}, {"updated_uptime": True}, {"uplink_age": -1},
+                       {"version": "1.0.0"}, {"version": None}):
             self.assertFalse(trial.healthy(dict(data, **change)))
 
     def observe(self, scan, sample=None, address=lambda _: True):

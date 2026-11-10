@@ -1,32 +1,607 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><title>Cellforge</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#090b10">
+<title>CELLFORGE</title>
 <style>
-:root{font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#e9f0ef;background:#101917;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:850px;margin:auto;padding:38px 22px 50px}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}h1{font-size:27px;letter-spacing:-1px;margin:0}small,.label{color:#97aaa3;font-size:13px}header small{display:block;margin-top:7px}.status{border:1px solid #32473f;border-radius:20px;padding:24px;background:#182720;margin-bottom:20px}.status strong{font-size:23px}.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:#81958b;margin-right:10px}#detail{line-height:1.7;color:#b1c2bb;margin:12px 0 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.card{padding:23px;background:#19241f;border:1px solid #2a3a32;border-radius:17px}.value{font-size:29px;font-variant-numeric:tabular-nums;margin-top:12px;letter-spacing:-.7px}.unit{font-size:14px;color:#97aaa3;margin-left:5px}.row{display:flex;justify-content:space-between;gap:16px;padding:15px 0;border-bottom:1px solid #293830}.row span:last-child{text-align:right;overflow-wrap:anywhere}section.info{padding:10px 4px;margin-top:21px}footer{font-size:12px;line-height:1.8;color:#8b9f95;margin-top:25px}#notice{color:#e0ba77}a{color:#9be0c0}@media(max-width:420px){main{padding:25px 16px}.card{padding:19px}.value{font-size:24px}}@media(prefers-color-scheme:light){:root{background:#f4f7f3;color:#153629}.card{background:#fff;border-color:#d5e0d5}.status{background:#e7f2e9;border-color:#c4d9c9}#detail,.label,small,footer{color:#587064}.row{border-color:#dce4dc}.unit{color:#587064}#notice{color:#936718}}
-</style></head><body><main>
-<header><div><h1>Cellforge</h1><small>1.0.0 · 试运行</small></div><small id="updated">正在连接</small></header>
-<div class="status"><strong><i class="dot" id="dot"></i><span id="state">读取连接状态</span></strong><p id="detail">正在获取模块信息。</p></div>
-<div class="grid">
-<div class="card"><div class="label">当前下载</div><div class="value" id="down-speed">—</div></div>
-<div class="card"><div class="label">当前上传</div><div class="value" id="up-speed">—</div></div>
-<div class="card"><div class="label">本次下载</div><div class="value" id="down-total">—</div></div>
-<div class="card"><div class="label">本次上传</div><div class="value" id="up-total">—</div></div>
-</div>
-<section class="info">
-<div class="row"><span class="label">移动网络</span><span id="radio">—</span></div>
-<div class="row"><span class="label">信号强度</span><span id="signal">—</span></div>
-<div class="row"><span class="label">设备 IP</span><span id="peer">—</span></div>
-<div class="row"><span class="label">模块局域网 IP</span><span id="local">—</span></div>
-<div class="row"><span class="label">蜂窝接口 IP</span><span id="cell">—</span></div>
-<div class="row"><span class="label">本次连接时长</span><span id="duration">—</span></div>
-<div class="row"><span class="label">恢复状态</span><span id="recovery">—</span></div>
+:root{font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#edf1fa;background:#090b10;font-synthesis:none;--muted:#858d9e;--line:#252a35;--blue:#155fea;--purple:#8135fb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 17%,rgba(21,95,234,.1),transparent 60%),#090b10}main{max-width:880px;margin:auto;padding:32px 24px 36px}header{display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:35px;height:35px;display:grid;place-items:center;border:1px solid #155fea;border-radius:12px;background:linear-gradient(145deg,#155fea30,#155fea0a);box-shadow:inset 0 0 15px #155fea14;color:#155fea;font-size:23px;font-weight:650}.brand-mark>span{display:block;transform:translateY(-2px)}.brand h1{font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:-.6px;margin:0}#updated{font-size:11px;color:var(--muted);text-align:right}.connection{display:flex;justify-content:center;margin-top:29px}.status-pill{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:#12161ed9;border-radius:99px;padding:9px 15px;font-size:12px;letter-spacing:.3px}.dot{width:7px;height:7px;border-radius:50%;background:#778294;box-shadow:0 0 10px #75829935;flex-shrink:0}.dot.blink{animation:blink 1.8s ease-in-out infinite}@keyframes blink{50%{opacity:.35}}
+.hero{position:relative;text-align:center}.globe-wrap{position:relative;width:min(100%,430px);aspect-ratio:1;margin:-5px auto -10px;isolation:isolate}/* .globe-wrap:before{content:"";position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle,#1763d322,#133a7710 52%,transparent 72%);filter:blur(20px);z-index:-1} */canvas{display:block;width:100%;height:100%}.section-label{display:flex;align-items:center;justify-content:space-between;margin:26px 2px 12px}.section-label h2{font-size:11px;font-weight:700;letter-spacing:1.4px;color:#a0a7b7;margin:0}.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}.card{min-width:0;background:linear-gradient(140deg,#151821,#101218);border:1px solid rgba(255,255,255,.1);border-top-color:rgba(255,255,255,.16);border-radius:16px;padding:20px 23px;box-shadow:0 8px 24px rgba(0,0,0,.12)}.speed-section{text-align:center}.speed-title,.card .label{font:inherit;font-size:12px;font-weight:400;letter-spacing:.3px}.speed-title{margin:18px 0 8px}.speed-row{display:grid;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);align-items:center;gap:24px;padding:10px 0 22px}.speed-item{display:flex;align-items:center;gap:10px;min-width:0}.speed-item.download{justify-content:flex-end}.speed-item.upload{justify-content:flex-start}.speed-arrow{color:var(--accent);font-size:18px;line-height:1}.speed-divider{width:1px;height:28px;background:var(--line)}.download{--accent:var(--blue);--accent-rgb:21,95,234}.upload{--accent:var(--purple);--accent-rgb:129,53,251}.label{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.6)}.direction{color:var(--accent);font-size:16px;line-height:1}.value{font-variant-numeric:tabular-nums;letter-spacing:-1.5px;line-height:1.2;margin-top:11px;font-size:39px;font-weight:600;display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;min-height:52px;overflow-wrap:anywhere}.speed-item .value{color:var(--accent);font-size:35px;flex-wrap:nowrap;margin-top:0;min-height:42px}.speed-item .value.unavailable{font-size:15px;letter-spacing:0}.unit{font-size:12px;font-weight:400;letter-spacing:0;color:#858fa3}.value.unavailable{font-size:19px;letter-spacing:0;align-items:center;color:#798497}.total-card{padding:18px 23px;background-image:linear-gradient(45deg,rgba(var(--accent-rgb),0),rgba(var(--accent-rgb),.3)),linear-gradient(140deg,#151821,#101218)}.total-card .value{font-size:29px;min-height:35px;letter-spacing:-.8px}.total-card .value.unavailable{font-size:17px}.info-grid .card{padding:17px 21px}.info-value{font-size:15px;font-variant-numeric:tabular-nums;line-height:1.6;margin-top:7px;color:#e1e6f0;overflow-wrap:anywhere}.info-value.address{font-size:13px;letter-spacing:.2px}.info-value.recovery{font-size:11px}.info-value .secondary{display:block;font-size:9px;color:var(--muted);margin-top:3px}.info-wide{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:20px}.info-wide .info-value{margin:0;text-align:right}footer{font-size:10px;line-height:1.9;color:#737c8e;margin-top:24px;padding:0 3px}#notice{color:#d1b373;margin-bottom:5px}.footer-meta{display:flex;justify-content:center;gap:15px;margin-top:17px;padding-top:15px;border-top:1px solid #1e232d;font-size:9px;letter-spacing:1.2px;color:#5f697c}main[data-stale="true"] .info-value,main[data-stale="true"] .total-card .value{opacity:.5}
+@media(min-width:700px){main{padding-top:38px}.globe-wrap{width:440px;margin-top:-12px;margin-bottom:-19px}.connection{margin-top:20px}.speed-item .value{font-size:43px}.info-grid .card{padding:19px 23px}}
+@media(max-width:420px){main{padding:23px 16px 28px}.brand h1{font-size:18px}.brand-mark{width:32px;height:32px}.connection{margin-top:25px}.globe-wrap{margin-top:0;margin-bottom:-4px}.grid{gap:10px}.card{padding:18px 16px;border-radius:14px}.speed-row{gap:14px;padding:10px 0 18px}.speed-item{gap:7px}.speed-item .value{font-size:27px;min-height:36px}.speed-divider{height:24px}.value{font-size:31px;min-height:44px;gap:4px}.unit{font-size:10px}.label{gap:6px}.total-card{padding:16px 16px}.total-card .value{font-size:26px}.info-grid .card{padding:15px 16px}.info-value{font-size:13px}.info-value.address{font-size:11px}.info-wide{gap:10px}.info-value.recovery{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.dot.blink{animation:none}}
+canvas{touch-action:none;user-select:none;cursor:grab}canvas.dragging{cursor:grabbing}
+</style>
+</head>
+<body>
+<main id="dashboard">
+<header><div class="brand"><div class="brand-mark" aria-hidden="true"><span>c</span></div><div><h1>CELLFORGE</h1></div></div><div id="updated">Connecting</div></header>
+<div class="connection"><div class="status-pill" role="status"><i class="dot" id="dot" aria-hidden="true"></i><span id="state">CHECKING</span></div></div>
+<section class="hero" aria-label="Module connection status">
+<div class="globe-wrap"><canvas id="globe" aria-hidden="true"></canvas></div>
 </section>
-<footer><div id="notice"></div>流量包含模块自身的联网检测，与运营商账单可能存在差异。页面关闭后，模块仍独立维护连接。</footer>
-</main><script>
-const $=id=>document.getElementById(id);let lastStamp=null,lastAdvance=0;
-const labels={active:['连接正常','设备侧通信与模块联网检测正常。'],recovering:['正在恢复连接','模块正在主动与设备通信。'],backoff:['等待设备恢复','已停止进一步重连，继续监测连接状态。'],sleeping:['设备正在休眠','模块维持保活，等待设备恢复 USB 通信。'],observing:['等待连接恢复','先等待设备自行恢复，再根据实际检测结果处理。'],limited:['连接尚未确认','移动网络状态已获取，设备连接或互联网检测暂未确认。'],detached:['等待连接设备','模块尚未建立设备连接。'],checking:['正在检查连接','等待新的连接证据。'],radio_fault:['移动网络异常','请检查 SIM 卡、网络覆盖及运营商服务。']};
-function bytes(v,suffix=''){if(v===null||!Number.isFinite(v))return '暂不可用';const units=['B','KB','MB','GB','TB'];let i=0;while(v>=1024&&i<units.length-1){v/=1024;i++}return `${v.toFixed(i?1:0)}<span class="unit">${units[i]}${suffix}</span>`}
-function recoveryText(d){const phases={active:'持续监测中',checking:'等待首次连接确认',unknown:'等待有效连接证据',observing:'等待设备恢复',sleeping:'休眠保活中',recovering:'主动重连中',confirming:'确认恢复稳定性',cooldown:'恢复后观察中',failed:'本次恢复未完成，继续监测',exhausted:'本次开机已达重连上限',detached:'等待设备连接',limited:'等待蜂窝联网确认'};return `${phases[d.recovery_mode]||'持续监测中'} · 本次开机 ${d.recovery_attempts||0}/3 次`}
-function offline(message){$('state').textContent=message;$('detail').textContent='请确认模块仍连接，并等待重新获取状态。';$('dot').style.background='#9e8c70';$('updated').textContent='状态未更新';for(const id of ['down-speed','up-speed'])$(id).textContent='暂不可用'}
-async function refresh(){const controller=new AbortController();const deadline=setTimeout(()=>controller.abort(),4000);try{const response=await fetch('status.json',{cache:'no-store',signal:controller.signal});if(!response.ok)throw Error('unavailable');const d=await response.json();const now=Date.now();if(d.updated_uptime!==lastStamp){lastStamp=d.updated_uptime;lastAdvance=now}if(now-lastAdvance>6000){offline('状态更新暂停');return}const info=labels[d.state]||labels.checking;$('state').textContent=info[0];$('detail').textContent=info[1];$('dot').style.background=d.led.startsWith('blue')?'#58a6ed':d.led.startsWith('red')?'#ef7972':d.led.startsWith('yellow')?'#e8c45c':'#69ba80';$('updated').textContent='刚刚更新';$('down-speed').innerHTML=bytes(d.download_Bps,'/s');$('up-speed').innerHTML=bytes(d.upload_Bps,'/s');$('down-total').innerHTML=bytes(d.download_bytes);$('up-total').innerHTML=bytes(d.upload_bytes);$('radio').textContent=d.network_type==='unknown'?'暂不可用':d.network_type;$('signal').textContent=d.signal_dbm===null?'暂不可用':`${d.signal_dbm} dBm`;$('peer').textContent=d.device_ip||'待确认';$('local').textContent=d.local_ip;$('cell').textContent=d.cellular_ip||'暂不可用';$('duration').textContent=`${Math.floor(d.session_seconds/3600)} 小时 ${Math.floor(d.session_seconds/60)%60} 分钟`;$('recovery').textContent=recoveryText(d);$('notice').textContent=d.session_uncertain?'恢复期间连接状态变化，流量统计连续性待确认。':d.discontinuities?'连接或计数器发生变化，累计值可能不完整。':d.led_control?'':'灯光暂由原厂控制。'}catch{offline('暂时无法读取模块')}finally{clearTimeout(deadline);setTimeout(refresh,1500)}}
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastStamp=null;lastAdvance=Date.now()}});refresh();
-</script></body></html>
+<section class="speed-section" aria-labelledby="speed-title">
+<h2 class="speed-title" id="speed-title">CURRENT SPEED</h2>
+<div class="speed-row">
+<div class="speed-item download" aria-label="Download speed"><span class="speed-arrow" aria-hidden="true">↓</span><div class="value" id="down-speed">—</div></div>
+<span class="speed-divider" aria-hidden="true"></span>
+<div class="speed-item upload" aria-label="Upload speed"><span class="speed-arrow" aria-hidden="true">↑</span><div class="value" id="up-speed">—</div></div>
+</div>
+</section>
+<section aria-labelledby="total-title">
+<div class="section-label"><h2 id="total-title">SESSION USAGE</h2></div>
+<div class="grid">
+<div class="card total-card download"><div class="label"><span class="direction" aria-hidden="true">↓</span>DOWNLOADED</div><div class="value" id="down-total">—</div></div>
+<div class="card total-card upload"><div class="label"><span class="direction" aria-hidden="true">↑</span>UPLOADED</div><div class="value" id="up-total">—</div></div>
+</div>
+</section>
+<section aria-labelledby="info-title">
+<div class="section-label"><h2 id="info-title">CONNECTION DETAILS</h2></div>
+<div class="grid info-grid">
+<div class="card"><div class="label">MOBILE NETWORK</div><div class="info-value" id="radio">—</div></div>
+<div class="card"><div class="label">SIGNAL STRENGTH</div><div class="info-value" id="signal">—</div></div>
+<div class="card"><div class="label">DEVICE IP</div><div class="info-value address" id="peer">—</div></div>
+<div class="card"><div class="label">MODULE LAN IP</div><div class="info-value address" id="local">—</div></div>
+<div class="card"><div class="label">CELLULAR IP</div><div class="info-value address" id="cell">—</div></div>
+<div class="card"><div class="label">SESSION DURATION</div><div class="info-value" id="duration">—</div></div>
+<div class="card info-wide"><div class="label">RECOVERY STATUS</div><div class="info-value recovery"><span id="recovery">—</span><span class="secondary" id="attempts"></span></div></div>
+</div>
+</section>
+<footer><div id="notice" role="status"></div><div id="stale-note" hidden>Usage totals and connection details show the last received data.</div><div class="footer-meta"><span>CELLFORGE <span id="version">1.1.0</span></span></div></footer>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function createGlobe(canvas){
+    const ctx=canvas.getContext('2d');
+    if(!ctx)return {setSpinning(){},visibilityChanged(){}};
+    // Natural Earth 1:110m physical land, public domain; 512 x 256 bit mask.
+    // https://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-land/
+    // Source GeoJSON SHA-256: 9e0729ee253ca7d7a5c4ae9395fb1902264c5377c52e224d13dd85010e2835d9
+    const maskWidth=512,maskHeight=256;
+    const landMask=Uint8Array.from(atob(
+        'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//DwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADA/P///wAA4P////8DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADA'
+        +'/////w/+77/////HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHP/////h////////f/8/AAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgP8B/P8f////////////AQAAAAAAMAcAAAD4AAAAAAAAAPgPAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAID/7///B/j/////////PwAAAAAAxvE/AAAAAAAAAAAAAADwPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwA/I//D4D//////////x8A'
+        +'AAAAAP8/AAAAAAAAAAAAAAAAgD8HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD88/D7/w////////////8PAAAAAAD8BwEAAAAAAAAAAAAAAADAPwAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAIAHAIADuP8B/P//////////DwAAAAAA4MEDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAHAADAA/7/'
+        +'Afj//////////z8AAAAAAMAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8ODjAH3gAMADg//////////8HAAAAAAAAAAAAAAAAAAD/'
+        +'AQAAAADw//8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP7jQx7wwx8AAADw////////DwAAAAAAAAAAAAAAAAD8BwAAAAD/////AwAAAPg/AAAAAAAAAAAAAAAA'
+        +'AAAAAACAHwCA5/8/AAAAwP///////wcAAAAAAAAAAAAAAACAPwAAAAD4////fwAAAADwHzwAAAAAAAAAAAAAAAAAAID/AQAAAAAAAAAAAID///////8BAAAA'
+        +'AAAAAAAAAAAAwAcAAAAA+P///w8AAAAAAAAAAAAAAAAAAAAAAAAAAACA/w8ABz8/HO4DAAAA////////AwAAAAAAAAAAAAAAAOABAAAA+P///////YEfAIAP'
+        +'AAAAAAAAAAAAAAAAAAAAwP/eycM+B/8fAAAAAPz//////wAAAAAAAAAAAAAAAAD4AAB8BPj/////////fwCAAQAAAAAAAAAAAAAAAAAAAOCf/78HfwP//x8A'
+        +'AAD+/////38AAAAAAAAAAAAAAAAAfAAAfOz7/////////38AwP8fAAAAAAAHAAAAAAAAAAAAD///B5gP////AwAA8P//////AQAAAAAAAAAAAAAAAPwAAD/3'
+        +'////////////+Pf/fwAAAACAAAAA8H8AAAAAAAD//x+AH/7//x8AALj/////zwEAAAAAAAAA/AcAAAAAAYB//P//////////////////BwAAAAAAAP7//x8A'
+        +'4E4A/v//kB+Af///AAD8/////38AAAAAAAAA8P8HAAAAAAAAf/7//////////////////wcAHAAAAID/////h///f/j/P/h8wA/4/wEAgP////8PAAAAAAAA'
+        +'APz//wEAAADAD37+//////////////////////h/AwD4//////////8fwAMA/McPwH8AAMD/////AQAAAAAAAID///8/AAAY3H/8/P//////////////////'
+        +'/////x8A4P//////////H4h/cP/jDxz/DwDw////AwAAAAAAAADg/////4GD//////j///////////////////////9/AID//////////////////w8M/x8A'
+        +'+P///wAAAAAAAAAA8P////+D8f///3/+/////////////////////////x9g/v///////////////78DgP//APD//z8AAAAGAAAAAPj////4kf////+/////'
+        +'//////////////////////w//v////////////////8fAMB/eADw//8DAMD/BwAAAAD+//j/A/7////////////////////////////////AB/j/////////'
+        +'////////7wH+/wEAwP9/AAAA/w8AAAAA/z/w/wP+////////////////////////////////AAIA+P///////////////+cPjv8HAMD/PwAAAP4HAAAAgP8/'
+        +'/v/j////////////////////////////////HwAgAPj//////////////3/wOQC8DwCA/z8AAAAwAAAAAOD/D///////////////////////////////////'
+        +'/z8AAMD///////////////9/AAAA+AwAAP8PAAAAAAAAAAD8/8P///////////////////////////////////9/AADg////////////////DwBC3oADAAD+'
+        +'BwAAAAAAAAAA///B//////////////////////////////////z/BwAA8P///////////////wcAAP4DAAAA/AcAAAAAAAAAgP//gP//////////////////'
+        +'/////////////3j+fwAAAOD//77///////////8DAAD+HwAAAMAHAAAAAAAAAID//8H//////////////////////////////z8Y/w8AAADM/38f+P//////'
+        +'////AQAA/B8AAAAAAwAAAAAAAACA//8HB/7///////////////////////////8PwD8EAAAAAPwfAwD+/////////wEAAP4fGAAAAAAAAAAAAAAAAP//A/j/'
+        +'//////////////////////////+PD/AAAAAAAAC0PwAA+P////////8HAAD+fzwAAAAAAAAAAAAAAAAf/wD+//////////////////////////8BAAB4AAAA'
+        +'AAAAAA8AAAD+////////DwAA/P9/AAAAAAAAAAAAAAcAAP8A+P//////////////////////////AAAAPgAAAAAAAIBzAAAA/P///////x8AAPj//wAAAAAA'
+        +'AAAAAAAfAEB+gP3/////////////////////////PwAAgP8AAAAAAADgAAAAAPj/////////AwD4//8AAAAAAAAAAAAADwBwfMD/////////////////////'
+        +'/////x8AAMD/AAAAAAAAPAAAAADw/////////w8A/P//AwAAAAAAAAAAAB8AMB/A//////////////////////////8HAADgPwAAAAAAAAMAAAAAwP//////'
+        +'////A/7//wcAAAAAAAAAAAA+ADADwP//////////////////////////AQAA4D8AAAAAAAAAAAAAAMD//////////4f///9/AAAAAAAAAADweABwgPf/////'
+        +'/////////////////////wcAAOAfAAAAAAAAAAAAAAAI//////////8H////fwAAAAAAAAAAfPAA8P/////////////////////////////vAADADwAAAAAA'
+        +'AAAAAAAAAP//////////B/////8BAAAAAAAAAHj+gf///////////////////////////////w8AwAcAAAAAAAAAAAAAABD8/////////w//////AQAAAAAA'
+        +'AAA8/MP///////////////////////////////8PAMABAAAAAAAAAAAAAAAA/P////////8f/////wAAAAAAAAAAAP7j////////////////////////////'
+        +'////DADAAAAAAAAAAAAAAAAAAPj//////////////48BAAAAAAAAAAD++f///////////////////////////////wwAAAAAAAAAAAAAAAAAAADc////////'
+        +'/////+fHAAAAAAAAAAAABfz///////////////////////////////8cAAAAAAAAAAAAAAAAAAAAMP////////////9g4AEAAAAAAAAAACD/////////////'
+        +'////////////////////HAAAAAAAAAAAAAAAAAAAAOD+//////////8/D/APAAAAAAAAAADI////////////////////////////////fwQAAAAAAAAAAAAA'
+        +'AAAAAACA/P//////////3w/wHwAAAAAAAAAA/P///////////////////////////////38EAAAAAAAAAAAAAAAAAAAAgP3//////////+8PABoAAAAAAAAA'
+        +'APD///////////////////////////////8/BAAAAAAAAAAAAAAAAAAAAAD/////////////HwAYAAAAAAAAAADg////////z///+P//////////////////'
+        +'HwwAAAAAAAAAAAAAAAAAAAAA/////////////18GAAAAAAAAAAAAwP//////h8P/H/D//////////////////w8AAAAAAAAAAAAAAAAAAAAAAP//////////'
+        +'////AQAAAAAAAAAAAMD///v//8Pv/wf8//////////////////8HAAAAAAAAAAAAAAAAAAAAAAD/////////////PAAAAAAAAAAAAADA///h//+B4f8D/v//'
+        +'////////////////AwYAAAAAAAAAAAAAAAAAAACA////////////PwwAAAAAAAAAAAAAwP/Hw///AQD/B////////////////////wF+AAAAAAAAAAAAAAAA'
+        +'AAAAgP///////////w8AAAAAAAAAAAAA+P8fgw///wAA/g/+/////////////////3+AfwAAAAAAAAAAAAAAAAAAAID///////////8HAAAAAAAAAAAAAPj/'
+        +'DxAP/H8AAPgP+P////////////////8DgA0AAAAAAAAAAAAAAAAAAACA////////////HwAAAAAAAAAAAAD4/w8QfvD/gAf4H+D/////////////////AYAB'
+        +'AAAAAAAAAAAAAAAAAAAAgP///////////wAAAAAAAAAAAAAA8P8DAPjw//U//D/A/////////////////wCAAQAAAAAAAAAAAAAAAAAAAID//////////38A'
+        +'AAAAAAAAAAAAAPj/ATDg86L///9/+P//////////////x38AgAMAAAAAAAAAAAAAAAAAAAAA//////////9/AAAAAAAAAAAAAAD4/wAwwPDA////P/D/////'
+        +'/////////2MeAIADAAAAAAAAAAAAAAAAAAAAAP//////////PwAAAAAAAAAAAAAA+P8AEIDgwf///z/w//////////////8QPACAAwAAAAAAAAAAAAAAAAAA'
+        +'AAD+/////////xcAAAAAAAAAAAAAAPh/AABAwMP///8/4P//////////////AHwAwAEAAAAAAAAAAAAAAAAAAAAA/P////////8PAAAAAAAAAAAAAADwfwAA'
+        +'PMCB////P+D//////////////xnwAOAAAAAAAAAAAAAAAAAAAAAAAPz/////////DwAAAAAAAAAAAAAAmB8AvyCAgf/////w//////////////8/8AD0AAAA'
+        +'AAAAAAAAAAAAAAAAAAD4/////////w8AAAAAAAAAAAAAAIAB/n8AAADE+P//////////////////D/AA/AAAAAAAAAAAAAAAAAAAAAAA8P////////8PAAAA'
+        +'AAAAAAAAAACAwf//AAAAAPn//////////////////wPw4P8AAAAAAAAAAAAAAAAAAAAAAPD/////////BwAAAAAAAAAAAAAAgP//fwAAAMD4////////////'
+        +'//////8DMPA/AAAAAAAAAAAAAAAAAAAAAACA/////////wEAAAAAAAAAAAAAAMD//38AAAAA+P//////////////////BwDcAwAAAAAAAAAAAAAAAAAAAAAA'
+        +'AP7///////8AAAAAAAAAAAAAAADw////AAAAAPz//////////////////w8ANwAAAAAAAAAAAAAAAAAAAAAAAAD+//////8/AAAAAAAAAAAAAAAA+P///w/A'
+        +'AAD8//////////////////8PAAYAAAAAAAAAAAAAAAAAAAAAAAAA/P//////HwAAAAAAAAAAAAAAAPj///8/8AMA/v//////////////////HwAGAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAJz//////w8AAAAAAAAAAAAAAAD8////f/B/HP7//////////////////x8AAgAAAAAAAAAAAAAAAAAAAAAAAACY//////8PAAAAAAAA'
+        +'AAAAAAAA/P/////z//////////////////////8fAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP/////BDgAAAAAAAAAAAAAAAPz///////////+P////////////'
+        +'////PwAAAAAAAAAAAAAAAAAAAAAAAAAAACD///+BABwAAAAAAAAAAAAAAAD+////////v/3/D////////////////x8AAAAAAAAAAAAAAAAAAAAAAAAAAABA'
+        +'/v9/AAAcAAAAAAAAAAAAAAAA/////////////x/+//////////////8fAAAAAAAAAAAAAAAAAAAAAAAAAAAA8Pj/PwAAPAAAAAAAAAAAAAAAwP////////9/'
+        +'/P8f/P//////////////DwAAAAAAAAAAAAAAAAAAAAAAAAAAAOD5/z8AADgAAAAAAAAAAAAAAOD///////////j/P/D+/////////////wcAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAA4f8/AAA4AAAAAAAAAAAAAADw///////////w/38A/v////////////8HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOP/PwAAMAAAAAAAAAAA'
+        +'AAAA+P//////////8f9/gfj/////////////AwAAAAAAAAAAAAAAAAAAAAAAAAAAAADD/x8AAAAAAAAAAAAAAAAAAPj//////////+P//8EAgP//////////'
+        +'/xEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhP8fAAAAAgAAAAAAAAAAAAD8///////////j///jAQD///////////8YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAj/'
+        +'HwAAAAAAAAAAAAAAAAAA/v//////////g////w8A/v////////9/GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI/h8AAD4AAAAAAAAAAAAAAP7//////////4f/'
+        +'//8PAPj/////////HwgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwfAADxAQAAAAAAAAAAAAD///////////8P////HwD8////+f///wEAAAAAAAAAAAAAAAAA'
+        +'AIAAAAAAAAAAAAD8HwAMAAcAAAAAAAAAAAAA////////////H////w8A+P//D/j//zEAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAA/D+ADwAOAAAAAAAAAAAA'
+        +'AP///////////x////8HAID//w/4//8QAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAPx/gA8APAAAAAAAAAAAAAD+//////////8f/v//AwAA//8H8P9/MAAA'
+        +'AAAAAAAAAAAAAAAAAAAEAAAAAAAAAAD4f4APAAAfAAAAAAAAAAAA/v//////////H/z//wMAAP//AeD/PxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8P/h'
+        +'BwBAfgAAAAAAAAAAAP7//////////x/4//8BAAD//wDA/38YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAID//wcADgQAAAAAAAAAAAD+//////////9/+P//'
+        +'AAAA/38AwP9/AAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8DAAAAAAAAAAAAAAAA/v//////////f/D/fwAAAP8fAMD//wAAOAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAPj/AwAAAAAAAAAAAAAAAP/////////////g/wcAAAD/HwDA/f8BADgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADA+OMAAAAAAAAAAAAAAAD/'
+        +'////////////4P8DAAAA/gMAgPj/AwAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/AwAAAAAAAAAAAAAA/////////////+H/AAAAAP4DAAD4/wcAGAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAADg/wMAAAAAAAAAAAAAAP/////////////nPwAAAAD8AwAA+P8HABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8B'
+        +'AAAAAAAAAAAAAAD/////////////zw8AAAAA/AMAAPj/BwDQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4AQAAAAAAAAAAAAAA/////////////98AAAAA'
+        +'APwDAAAw/wcAkAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AEABAAAAAAAAAAAAP////////////8/AAAAAAD4AwAAMPwHABACAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAOABABcAAAAAAAAAAAD+////////////H4ABAAAA+AMAADD8BwAgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAeB/AAAAAAAAAAAA+P//'
+        +'/////////z/4AQAAAPADAAAw+AMA4AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAPg+3cBAAAAAAAAAPj//////////////wAAAADwAQAAEOAAAIICAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH8Pv/AQAAAAAAAADg//////////////8AAAAA4AQAABBgAABBBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfvv/'
+        +'/wMAAAAAAAAA4P//////////////AAAAAGAEAAAwIAAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADD+//8PAAAAAAAAAOD/////////////fwAAAABA'
+        +'DgAAYAAAAMAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg/v//HwAAAAAAAADA/////////////38AAAAAAA4AAGAAAABADgAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAPz//z8AAAAAAAAAAP////////////8/AAAAAAAMAADAAQBAAAsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8//9/AgAAAAAAAAD+/4P/'
+        +'////////PwAAAAAAAAAAgAMAYAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/P///x8AAAAAAAAA/H+A/////////x8AAAAAAAAAAIMHAPABAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAPz///8/AAAAAAAAADAAAPf///////8PAAAAAAAAAACPBwD8AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8////'
+        +'fwAAAAAAAAAAAADg////////BwAAAAAAAAAAngcAfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/P////8AAAAAAAAAAAAAwP///////wcAAAAAAAAA'
+        +'ADwHAH4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////AAAAAAAAAAAAAMD///////8DAAAAAAAAAAB4DsD/AAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAD//////wEAAAAAAAAAAADg////////AAAAAAAAAAAA8A3Q/wAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA//////8BAAAAAAAAAAAA4P//'
+        +'////fwAAAAAAAAAAAOAD+P8RYgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwP//////AAAAAAAAAAAAAOD//////x8AAAAAAAAAAADgB/h/iGEAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAMD//////wcAAAAAAAAAAADg//////8fAAAAAAAAAAAAwAf4fwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADg//////8/'
+        +'AAAAAAAAAAAA4P//////DwAAAAAAAAAAAIAP8H9kAHwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4P///////wAAAAAAAAAAAOD//////wcAAAAAAAAAAACA'
+        +'H+A/HABwGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOD///////8FAAAAAAAAAADA//////8DAAAAAAAAAAAAAD/gPx4AQHwAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAADA/////////wAAAAAAAAAAgP//////AQAAAAAAAAAAAAB+gB820PP+BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4P////////8DAAAAAAAAAAD/////'
+        +'/wEAAAAAAAAAAAAAfAAINACg/z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/////////BwAAAAAAAAAA//////8AAAAAAAAAAAAAAHgAAGQAAP5/AAMAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAADg/////////z8AAAAAAAAAAP7///9/AAAAAAAAAAAAAABwAABEAADw/6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4P////////8/'
+        +'AAAAAAAAAAD+////fwAAAAAAAAAAAAAAgAEAAACA4P9zEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMD/////////PwAAAAAAAAAA/P////8AAAAAAAAAAAAAAMBj'
+        +'AAAAAOD/AyAAAAAAAAAAAAAAAAAAAAAAAAAAAACA/////////38AAAAAAAAAAPz/////AAAAAAAAAAAAAAAA/wEAAADg/wEAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAgP////////8/AAAAAAAAAAD4/////wAAAAAAAAAAAAAAAOAPAAAA8A8HAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////////PwAAAAAAAAAA+P////8A'
+        +'AAAAAAAAAAAAAAAAwDkMAAAPBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////////x8AAAAAAAAAAPj/////AAAAAAAAAAAAAAAAAAAEAwAAAA4AKAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAP7///////8fAAAAAAAAAAD4/////wEAAAAAAAAAAAAAAAAACAEAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+////////DwAA'
+        +'AAAAAAAA+P////8DAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/P///////wcAAAAAAAAAAPj/////AwAAAAAAAAAAAAAAAAAA'
+        +'ACAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPz///////8DAAAAAAAAAAD4/////wMAAAAAAAAAAAAAAAAAAAD8BwwAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAD4////////AQAAAAAAAAAA/P////8DYAAAAAAAAAAAAAAAAAAA/gMOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+P///////wEAAAAAAAAAAPz/////A2AA'
+        +'AAAAAAAAAAAAAAAAAP4DDgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD///////8BAAAAAAAAAAD+/////wNwAAAAAAAAAAAAAAAAADj/AT4AAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAADg////////AQAAAAAAAAAA/v////8D+AAAAAAAAAAAAAAAAAD8/wF+AAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAwP///////wEAAAAA'
+        +'AAAAAP7/////Af4AAAAAAAAAAAAAAAAA/v8HfgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///////8AAAAAAAAAAAD+/////4B/AAAAAAAAAAAAAAAAAP//'
+        +'D34AAABAAMAAAAAAAAAAAAAAAAAAAAAAAAAA/P//////AAAAAAAAAAAA/v///z+APwAAAAAAAAAAAAAAAMD//z//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'APj//////wAAAAAAAAAAAP7///8fgD8AAAAAAAAAAAAAAADA/////wAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAADw//////8AAAAAAAAAAAD+////D4A/AAAA'
+        +'AAAAAAAAAAAA4P////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8P//////AAAAAAAAAAAA/P///wOAPwAAAAAAAAAAAAAAAPD/////AQAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAPD/////fwAAAAAAAAAAAPz///8BgB8AAAAAAAAAAAAAAAD+/////wcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw/////z8AAAAAAAAA'
+        +'AAD4////A4AfAAAAAAAAAAAAAADA//////8PAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA8P////8/AAAAAAAAAAAA+P///wPAHwAAAAAAAAAAAAAA8P//////'
+        +'DwAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD/////HwAAAAAAAAAAAPD///8HwA8AAAAAAAAAAAAAAPj//////x8AADAAAAAAAAAAAAAAAAAAAAAAAAAAAADw'
+        +'/////w8AAAAAAAAAAADw////B8APAAAAAAAAAAAAAAD8//////8/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8P////8AAAAAAAAAAAAA8P///wPADwAAAAAA'
+        +'AAAAAAAA/P//////fwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPD///8/AAAAAAAAAAAAAOD///8DwAcAAAAAAAAAAAAAAP7///////8AAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAADw////DwAAAAAAAAAAAADg////AIAHAAAAAAAAAAAAAAD8////////AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+P///wcAAAAAAAAAAAAA'
+        +'4P//PwAAAAAAAAAAAAAAAAAA/P///////wMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPj///8HAAAAAAAAAAAAAOD//38AAAAAAAAAAAAAAAAAAP7///////8D'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4////BwAAAAAAAAAAAADA//9/AAAAAAAAAAAAAAAAAAD8////////AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+P//'
+        +'/wcAAAAAAAAAAAAAwP//PwAAAAAAAAAAAAAAAAAA/P///////wMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPj///8HAAAAAAAAAAAAAID//z8AAAAAAAAAAAAA'
+        +'AAAAAPj///////8DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8////AwAAAAAAAAAAAAAA//8fAAAAAAAAAAAAAAAAAAD4////////AwAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAA/P///wEAAAAAAAAAAAAAAP//DwAAAAAAAAAAAAAAAAAA8P///////wMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPz///8AAAAAAAAAAAAAAAD+'
+        +'/wcAAAAAAAAAAAAAAAAAAPD///////8DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8//9/AAAAAAAAAAAAAAAA/P8HAAAAAAAAAAAAAAAAAADw////////AwAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAA/P//PwAAAAAAAAAAAAAAAPz/AQAAAAAAAAAAAAAAAAAA4P8/8P///wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPz//x8A'
+        +'AAAAAAAAAAAAAAD8/wAAAAAAAAAAAAAAAAAAAOD/A4D///8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8//8fAAAAAAAAAAAAAAAA/D8AAAAAAAAAAAAAAAAA'
+        +'AADw/wAA9///AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/P//DwAAAAAAAAAAAAAAAHwAAAAAAAAAAAAAAAAAAAAA8AMAAPP/fwAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAP7/PwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAADo/38AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAD+/38AAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAA4P8/AAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAA//9/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAID/PwAAAIAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAP//fwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA/x8AAAAAAwAAAAAAAAAAAAAAAAAAAAAAAID//z8AAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgP8fAAAAAAMAAAAAAAAAAAAAAAAAAAAAAACA//8fAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAADcAQAAAAA/AAAAAAAAAAAAAAAAAAAAAAAAAP9/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHwAAAAAAAAAAAAAAAAAA'
+        +'AAAAAID//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAACA/38AAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAgP8nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAcAAACgAgAA'
+        +'AAAAAAAAAAAAAAAAAAAAAID/DwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAHAAAA8AAAAAAAAAAAAAAAAAAAAAAAAABA/j8AAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAwAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAQP8PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAgAEAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAD/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHwAAAAAAAAAAAAAAAAAAAAAA'
+        +'AADA/wcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwA8AAAAAAAAAAAAAAAAAAAAAAAAAwP8BAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAOAHAAAAAAAAAAAAAAAAAAAAAAAAAOD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAwAAAAAA'
+        +'AAAAAAAAAAAAAAAAAADg/wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwP8HAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOD/AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'4P8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAA4D8APgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAfAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAdwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgP0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+'
+        +'AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAAAAAAA+AAAAAAAAAAAAAAAAAAAAAAAAAAD+AQAAAAAgAAA/wA8AAPwDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAA'
+        +'AADg/wcAAAAA/kTQ////8f////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAA/v9/fAAA+P//////////////AAAAAAAA'
+        +'AAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAB8P////8HAP///////////////x8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcPwAAAAAA'
+        +'AAAAAAAAAAAAAACAH/7/////B4D/////////////////PwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvH8AAAAAAAAAAAAAAAAAAA8A+P///////wH+////////'
+        +'//////////8HAAAAAAAAAAAAAAAAAAAAAAAAAAAAALz/AAAAAAAAAAAAAACAf/7///////////8B////////////////////fwAAAAAAAAAAAAAAAAAAAAAA'
+        +'AAAAAMB//wEAAAAAAAAAAMZ4/v//////////////wf//////////////////////AwAAAAAAAAAAAAAAAAAAgH8AAADgP/4BAAAAAAAAAID/////////////'
+        +'/////+H//////////////////////wcAAAAAAAAAAAAAAAAAACACAAIAAID/AQAAAAAAAADg//////////////////////////////////////////8DAAAA'
+        +'AAAAAAAAABgEAADgH/5/YAP//wMAAAAAAAAA/v//////////////////////////////////////////AQAAAAAAAAAAAAAAgHsAAP////////8BAAAAAAAA'
+        +'APz/////////////////////////////////////////PwAAAAAAAAAAAPj/////HwD8//////8fAAAAAAAAAAD/////////////////////////////////'
+        +'/////////wcAAAAAAAAAAP//////////////////BwAAAAAAAADw//////////////////////////////////////////8BAAAAAAAAAAD/////////////'
+        +'////HwAAAAAAAADw////////////////////////////////////////////AQAAAAAAAADw////////////////AwAAAAAAAADA////////////////////'
+        +'/////////////////////////wEAAAAAAID//////////////////38AAAAAAAAA/P////////////////////////////////////////////8DAAAAAAAH'
+        +'//////////////////8BAAAAAPwB4P//////////////////////////////////////////////HwAAAAAAHvD/////////////////AQAAAAD+A+D/////'
+        +'/////////////////////////////////////////wEAAAAAAAAAwP///////////////wcAAAKA/wMAwP//////////////////////////////////////'
+        +'/////x8AAAAAAAAAAID/////////////////AfwH+H8AAMD///////////////////////////////////////////8PAAAAAAAAAPz5////////////////'
+        +'/z8AAAAAAPj/////////////////////////////////////////////HwAAAAAAAADg////////////////////fwAA//n/////////////////////////'
+        +'/////////////////////38AAAAAAAAAgP////////////////////8P/v//////////////////////////////////////////////////AwAAAAAAAMD/'
+        +'//////////////////////////////////////////////////////////////////////////8AAAB4AAAA/P//////////////////////////////////'
+        +'////////////////////////////////////////HwD//x8AAADg////////////////////////////////////////////////////////////////////'
+        +'//////////////+H////////////////////////////////////////////////////////////////////////////////////////////////////////'
+        +'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'
+        +'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'
+        +'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'
+        +'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'
+        +'/////w=='
+    ),character=>character.charCodeAt(0));
+    function isLand(lon,lat){
+        const col=Math.min(maskWidth-1,Math.max(0,Math.floor((lon+Math.PI)/(Math.PI*2)*maskWidth)));
+        const row=Math.min(maskHeight-1,Math.max(0,Math.floor((Math.PI/2-lat)/Math.PI*maskHeight)));
+        const index=row*maskWidth+col;
+        return (landMask[index>>3]>>(index&7))&1;
+    }
+    const rad=Math.PI/180,points=[];
+    const vector=(lon,lat)=>[Math.cos(lat)*Math.sin(lon),Math.sin(lat),Math.cos(lat)*Math.cos(lon)];
+    // Svalbard Global Seed Vault: approximately 78.24 N, 15.49 E.
+    const seedVault=vector(15.49*rad,78.24*rad);
+    const vaultCoordinates='78.24°N, 15.49°E',vaultName='Svalbard Global Seed Vault';
+    const typeInterval=40,typePause=240,vaultFadeDuration=240,vaultTypeDuration=(vaultCoordinates.length+vaultName.length)*typeInterval+typePause;
+    const count=9000,goldenAngle=Math.PI*(3-Math.sqrt(5));
+    for(let i=0;i<count;i++){
+        const y=1-2*(i+.5)/count,ring=Math.sqrt(1-y*y);
+        const lon=(i*goldenAngle)%(Math.PI*2)-Math.PI,lat=Math.asin(y);
+        points.push([ring*Math.sin(lon),y,ring*Math.cos(lon),isLand(lon,lat)]);
+    }
+    const lines=[];
+    for(let lat=-60;lat<=60;lat+=30){
+        const line=[];for(let lon=-180;lon<=180;lon+=4)line.push(vector(lon*rad,lat*rad));lines.push(line);
+    }
+    for(let lon=0;lon<360;lon+=30){
+        const line=[];for(let lat=-90;lat<=90;lat+=4)line.push(vector(lon*rad,lat*rad));lines.push(line);
+    }
+    const globeSpeed=Math.PI*2/90000,decorationSpeed=globeSpeed*2;
+    function drift(min,max,value,speed,minimumDuration=1){
+        const target=min+Math.random()*(max-min);
+        return {min,max,value,from:value,to:target,elapsed:0,blend:0,speed,minimumDuration,duration:Math.max(minimumDuration,Math.abs(target-value)/speed)};
+    }
+    function advanceDrift(motion,elapsed){
+        motion.elapsed=Math.min(motion.duration,motion.elapsed+elapsed);
+        const progress=motion.elapsed/motion.duration;
+        motion.blend=progress*progress*(3-2*progress);
+        motion.value=motion.from+(motion.to-motion.from)*motion.blend;
+        const completed=motion.elapsed===motion.duration;
+        if(completed){
+            motion.from=motion.to;
+            motion.to=motion.min+Math.random()*(motion.max-motion.min);
+            motion.elapsed=0;
+            motion.duration=Math.max(motion.minimumDuration,Math.abs(motion.to-motion.from)/motion.speed);
+        }
+        return completed;
+    }
+    const orbits=[
+        {rx:1.3,ry:.39,tilt:-.36,turn:.35,speed:.00019,phase:Math.random()*Math.PI*2,wobble:drift(-9*rad,9*rad,0,globeSpeed*.28)},
+        {rx:.39,ry:1.3,tilt:-.42,turn:.6,speed:.00012,phase:Math.random()*Math.PI*2,wobble:drift(-9*rad,9*rad,0,globeSpeed*.43)}
+    ];
+    function orbitRate(orbit){
+        const cosine=Math.cos(orbit.phase),sine=Math.sin(orbit.phase);
+        const major=Math.max(orbit.rx,orbit.ry);
+        const alongMinor=orbit.rx>=orbit.ry?sine:cosine;
+        const tangent=Math.hypot(orbit.rx*sine,orbit.ry*cosine);
+        return orbit.speed*major*(.3+1.2*alongMinor*alongMinor)/tangent;
+    }
+    function arcOpacityTarget(alpha,length){
+        const change=length.to>length.from?.15:length.to<length.from?-.1:0;
+        return Math.max(0,Math.min(1,alpha+change));
+    }
+    const arcs=[[-.95,-.25,.32],[.35,1.15,.16],[2.1,2.65,.25],[3.5,3.85,.16]].map(([start,end,alpha])=>{
+        const length=drift(.35,.8,end-start,decorationSpeed,800);
+        return {
+            center:(start+end)/2,baseAlpha:alpha,alpha,alphaFrom:alpha,
+            alphaTarget:arcOpacityTarget(alpha,length),length,
+            rotation:drift(-9*rad,9*rad,0,decorationSpeed)
+        };
+    });
+    function advanceArc(arc,elapsed){
+        const completed=advanceDrift(arc.length,elapsed);
+        arc.alpha=arc.alphaFrom+(arc.alphaTarget-arc.alphaFrom)*arc.length.blend;
+        if(completed){
+            arc.alphaFrom=arc.alpha;
+            arc.alphaTarget=arcOpacityTarget(arc.baseAlpha,arc.length);
+        }
+        advanceDrift(arc.rotation,elapsed);
+    }
+    let size=0,angle=100*rad,pitch=0,drag=null,frame=null,lastFrame=0,desired=false;
+    let vaultSelected=false,vaultHit=null,vaultTypeElapsed=0,vaultClosing=false,vaultCloseElapsed=0;
+    const tilt=-.14,ct=Math.cos(tilt),st=Math.sin(tilt);
+    const lightLength=Math.hypot(-.45,.55,.7);
+    function surfaceLight(nx,ny,nz){
+        return Math.max(0,Math.min(1,(-.45*nx+.55*ny+.7*nz)/lightLength));
+    }
+    function drawOrbit(orbit,front,center,r){
+        ctx.save();ctx.translate(center,center);ctx.rotate(orbit.tilt+orbit.wobble.value);
+        const horizontal=orbit.rx>=orbit.ry;
+        const shade=horizontal
+            ?ctx.createLinearGradient(0,-r*orbit.ry,0,r*orbit.ry)
+            :ctx.createLinearGradient(-r*orbit.rx,0,r*orbit.rx,0);
+        shade.addColorStop(0,'rgba(117,187,255,.15)');
+        shade.addColorStop(.5,'rgba(117,187,255,.45)');
+        shade.addColorStop(1,'rgba(117,187,255,.75)');
+        const start=(horizontal?0:-Math.PI/2)+(front?0:Math.PI);
+        ctx.strokeStyle=shade;ctx.lineWidth=.7;ctx.beginPath();
+        ctx.ellipse(0,0,r*orbit.rx,r*orbit.ry,0,start,start+Math.PI);
+        ctx.stroke();ctx.restore();
+    }
+    function draw(){
+        if(!size)return;
+        const center=size/2,r=size*.333,sa=Math.sin(angle),ca=Math.cos(angle),cp=Math.cos(pitch),sp=Math.sin(pitch);
+        const project=p=>{
+            const x=p[0]*ca-p[2]*sa,z=p[0]*sa+p[2]*ca;
+            const y=p[1]*cp-z*sp,depth=p[1]*sp+z*cp;
+            return [center+x*r,center-(y*ct-depth*st)*r,y*st+depth*ct];
+        };
+        ctx.clearRect(0,0,size,size);
+        const sphereBackground=ctx.createRadialGradient(center,center,0,center,center,r);
+        sphereBackground.addColorStop(0,'rgba(30,127,255,.39)');
+        sphereBackground.addColorStop(1/3,'rgba(30,127,255,.25)');
+        sphereBackground.addColorStop(2/3,'rgba(30,127,255,.12)');
+        sphereBackground.addColorStop(1,'rgba(30,127,255,0)');
+        ctx.save();ctx.shadowBlur=0;ctx.shadowColor='transparent';
+        ctx.fillStyle=sphereBackground;ctx.beginPath();
+        ctx.arc(center,center,r,0,Math.PI*2);ctx.fill();ctx.restore();
+        for(const orbit of orbits)drawOrbit(orbit,false,center,r);
+        const graticule=ctx.createRadialGradient(center,center,0,center,center,r);
+        graticule.addColorStop(0,'rgba(30,127,255,.9)');
+        graticule.addColorStop(1/3,'rgba(30,127,255,.6)');
+        graticule.addColorStop(2/3,'rgba(30,127,255,.3)');
+        graticule.addColorStop(1,'rgba(30,127,255,0)');
+        ctx.lineWidth=.6;ctx.strokeStyle=graticule;
+        for(const line of lines){
+            ctx.beginPath();let started=false;
+            for(const p of line){const [x,y,z]=project(p);if(z<0){started=false;continue}if(started)ctx.lineTo(x,y);else{ctx.moveTo(x,y);started=true}}
+            ctx.stroke();
+        }
+        const lightLevels=8,binCount=6*lightLevels;
+        const landBins=Array.from({length:binCount},()=>[]),waterBins=Array.from({length:binCount},()=>[]);
+        for(const p of points){
+            const projected=project(p),depth=projected[2];
+            if(depth<=.04)continue;
+            const light=surfaceLight((projected[0]-center)/r,(center-projected[1])/r,depth);
+            const bin=Math.min(5,Math.floor(depth*6))*lightLevels+Math.min(lightLevels-1,Math.floor(light*lightLevels));
+            (p[3]?landBins:waterBins)[bin].push(projected);
+        }
+        const colors=['#bbdeff55','#bbdeffa0','#bbdeffcc','#bbdefff0'];
+        ctx.save();
+        for(const layer of [{land:false,bins:waterBins},{land:true,bins:landBins}]){
+            for(let i=0;i<layer.bins.length;i++){
+                const depthBand=Math.floor(i/lightLevels),light=(i%lightLevels)/(lightLevels-1);
+                ctx.globalAlpha=Math.pow((depthBand+1)/6,1.4)*(.7+.3*light)*(layer.land?1:.3);
+                ctx.fillStyle=layer.land?colors[Math.min(3,Math.floor(depthBand*4/6))]:'#bbdeff';
+                ctx.beginPath();
+                for(const [x,y,depth] of layer.bins[i]){
+                    const dot=size*(layer.land?.0048:.0025)*Math.sqrt(Math.max(.08,depth));
+                    ctx.rect(x-dot/2,y-dot/2,dot,dot);
+                }
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+        for(const orbit of orbits)drawOrbit(orbit,true,center,r);
+        ctx.save();
+        const rim=ctx.createLinearGradient(center-r,center-r,center+r,center+r);
+        rim.addColorStop(0,'rgba(86,164,237,.75)');
+        rim.addColorStop(.45,'rgba(57,124,190,.45)');
+        rim.addColorStop(1,'rgba(57,124,190,.15)');
+        ctx.strokeStyle=rim;ctx.lineWidth=.85;ctx.shadowColor='rgba(57,124,190,.14)';ctx.shadowBlur=6;
+        ctx.beginPath();ctx.arc(center,center,r,0,Math.PI*2);ctx.stroke();ctx.restore();
+        const [vaultX,vaultY,vaultDepth]=project(seedVault);
+        vaultHit=vaultDepth>0?{x:vaultX,y:vaultY}:null;
+        if(vaultDepth>0){
+            const fade=Math.min(1,vaultDepth/.06);
+            ctx.save();ctx.globalAlpha=fade*fade*(3-2*fade);
+            ctx.fillStyle='#ffd88a';ctx.shadowBlur=0;ctx.shadowColor='transparent';
+            ctx.beginPath();ctx.arc(vaultX,vaultY,2,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
+        for(const arc of arcs){
+            const midpoint=arc.center+arc.rotation.value,half=arc.length.value/2;
+            ctx.strokeStyle='rgba(75,145,225,'+arc.alpha+')';ctx.lineWidth=size*.012;
+            ctx.beginPath();ctx.arc(center,center,r*1.18,midpoint-half,midpoint+half);ctx.stroke();
+        }
+        ctx.save();ctx.fillStyle='#a0d5ff';
+        ctx.shadowColor='rgba(160,213,255,.6)';ctx.shadowBlur=8;
+        for(const orbit of orbits){
+            const x=r*orbit.rx*Math.cos(orbit.phase),y=r*orbit.ry*Math.sin(orbit.phase);
+            const rotation=orbit.tilt+orbit.wobble.value,cosine=Math.cos(rotation),sine=Math.sin(rotation);
+            const depth=orbit.rx>=orbit.ry?Math.sin(orbit.phase):Math.cos(orbit.phase);
+            ctx.globalAlpha=.09+.91*(depth+1)/2;
+            ctx.beginPath();
+            ctx.arc(center+x*cosine-y*sine,center+x*sine+y*cosine,3,0,Math.PI*2);
+            ctx.fill();
+        }
+        ctx.restore();
+        ctx.strokeStyle='#498ecb55';ctx.lineWidth=.7;
+        for(const side of [-1,1]){const x=center+side*r*1.34;ctx.beginPath();ctx.moveTo(x-4,center);ctx.lineTo(x+4,center);ctx.moveTo(x,center-4);ctx.lineTo(x,center+4);ctx.stroke()}
+        if(vaultSelected&&vaultDepth>0){
+            const fade=Math.min(1,vaultDepth/.06);
+            ctx.save();ctx.globalAlpha=fade*fade*(3-2*fade);
+            ctx.fillStyle='#ffd88a';ctx.shadowBlur=0;ctx.shadowColor='transparent';
+            ctx.font='11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+            ctx.textAlign='left';ctx.textBaseline='top';
+            const coordinateCount=Math.min(vaultCoordinates.length,Math.floor(vaultTypeElapsed/typeInterval));
+            const nameCount=Math.max(0,Math.min(vaultName.length,Math.floor((vaultTypeElapsed-vaultCoordinates.length*typeInterval-typePause)/typeInterval)));
+            const nameAlpha=vaultClosing?1-Math.min(1,vaultCloseElapsed/vaultFadeDuration):1;
+            const coordinateAlpha=vaultClosing?1-Math.max(0,Math.min(1,(vaultCloseElapsed-vaultFadeDuration)/vaultFadeDuration)):1;
+            ctx.globalAlpha=fade*fade*(3-2*fade)*coordinateAlpha;
+            if(coordinateCount&&coordinateAlpha>0)ctx.fillText(vaultCoordinates.slice(0,coordinateCount),vaultX-ctx.measureText(vaultCoordinates).width/2,vaultY+8);
+            ctx.globalAlpha=fade*fade*(3-2*fade)*nameAlpha;
+            if(nameCount&&nameAlpha>0)ctx.fillText(vaultName.slice(0,nameCount),vaultX-ctx.measureText(vaultName).width/2,vaultY+23);
+            ctx.restore();
+        }
+    }
+    function labelAnimating(){return vaultSelected&&vaultHit&&(vaultClosing||vaultTypeElapsed<vaultTypeDuration)&&!reducedMotion.matches}
+    function tick(now){
+        frame=null;
+        if((!desired&&!labelAnimating())||document.hidden||reducedMotion.matches){lastFrame=0;return}
+        if(!lastFrame||now-lastFrame>=1000/24){
+            if(lastFrame){
+                const elapsed=Math.min(now-lastFrame,100);
+                if(labelAnimating()){
+                    if(vaultClosing){
+                        vaultCloseElapsed=Math.min(vaultFadeDuration*2,vaultCloseElapsed+elapsed);
+                        if(vaultCloseElapsed===vaultFadeDuration*2){vaultSelected=false;vaultClosing=false;}
+                    }else vaultTypeElapsed=Math.min(vaultTypeDuration,vaultTypeElapsed+elapsed);
+                }
+                if(desired){
+                    if(!drag)angle+=elapsed*globeSpeed;
+                    for(const orbit of orbits){
+                        orbit.phase=(orbit.phase+elapsed*orbitRate(orbit))%(Math.PI*2);
+                        orbit.tilt=(orbit.tilt+elapsed*globeSpeed*orbit.turn)%(Math.PI*2);
+                        advanceDrift(orbit.wobble,elapsed);
+                    }
+                    for(const arc of arcs)advanceArc(arc,elapsed);
+                }
+            }
+            lastFrame=now;draw();
+        }
+        if(desired||labelAnimating())frame=requestAnimationFrame(tick);
+        else lastFrame=0;
+    }
+    function sync(){
+        if(document.hidden)clearDrag();
+        if(reducedMotion.matches&&vaultSelected){
+            if(vaultClosing){vaultSelected=false;vaultClosing=false;}
+            else vaultTypeElapsed=vaultTypeDuration;
+        }
+        if(frame!==null)cancelAnimationFrame(frame);
+        frame=null;lastFrame=0;
+        if((desired||labelAnimating())&&!document.hidden&&!reducedMotion.matches)frame=requestAnimationFrame(tick);
+        else if(!document.hidden)draw();
+    }
+    function resize(){
+        size=canvas.getBoundingClientRect().width;
+        const ratio=Math.min(window.devicePixelRatio||1,1.75);
+        canvas.width=Math.round(size*ratio);canvas.height=Math.round(size*ratio);
+        ctx.setTransform(ratio,0,0,ratio,0,0);draw();
+    }
+    function clearDrag(){
+        if(!drag)return;
+        const id=drag.id;drag=null;
+        canvas.classList.remove('dragging');
+        if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
+    }
+    function finishDrag(event){
+        if(!drag||(event&&event.pointerId!==drag.id))return;
+        const tapped=event&&event.type==='pointerup'&&drag.vaultTap&&!drag.moved&&hitVault(event);
+        if(tapped){
+            if(vaultSelected&&!vaultClosing){vaultClosing=true;vaultCloseElapsed=0;}
+            else{vaultSelected=true;vaultClosing=false;vaultTypeElapsed=0;vaultCloseElapsed=0;}
+        }
+        clearDrag();sync();
+        if(tapped)draw();
+    }
+    function hitVault(event){
+        if(!vaultHit)return false;
+        const rect=canvas.getBoundingClientRect();
+        return Math.hypot(event.clientX-rect.left-vaultHit.x,event.clientY-rect.top-vaultHit.y)<=12;
+    }
+    canvas.addEventListener('pointerdown',event=>{
+        if(drag||!event.isPrimary||event.button!==0||!size||document.hidden)return;
+        canvas.setPointerCapture(event.pointerId);
+        drag={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false,vaultTap:hitVault(event)};
+        canvas.classList.add('dragging');
+        event.preventDefault();
+    });
+    canvas.addEventListener('pointermove',event=>{
+        if(!drag||event.pointerId!==drag.id)return;
+        if(event.pointerType==='mouse'&&event.buttons===0){finishDrag(event);return}
+        if(Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)>5)drag.moved=true;
+        const radius=size*.333;
+        angle=(angle-(event.clientX-drag.x)/radius)%(Math.PI*2);
+        pitch=Math.max(-Math.PI*.45,Math.min(Math.PI*.45,pitch+(event.clientY-drag.y)/radius));
+        drag.x=event.clientX;drag.y=event.clientY;
+        event.preventDefault();draw();
+    });
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,finishDrag);
+    window.addEventListener('blur',()=>finishDrag());
+    window.addEventListener('resize',resize,{passive:true});
+    if(reducedMotion.addEventListener)reducedMotion.addEventListener('change',sync);
+    else reducedMotion.addListener(sync);
+    resize();
+    return {setSpinning(value){if(desired!==value){desired=value;sync()}},visibilityChanged:sync};
+}
+
+const globe=createGlobe($('globe'));
+let lastStamp=null,lastAdvance=0;
+const labels={active:'CONNECTED',recovering:'RECONNECTING',backoff:'RECOVERY PAUSED',sleeping:'SLEEPING',observing:'WAITING',limited:'UNCONFIRMED',detached:'NO DEVICE',checking:'CHECKING',radio_fault:'NETWORK ISSUE'};
+const phases={active:'Monitoring',checking:'Awaiting initial connection',unknown:'Awaiting connection evidence',observing:'Waiting for device',sleeping:'Sleep keepalive active',recovering:'Reconnecting',confirming:'Confirming stability',cooldown:'Monitoring after recovery',failed:'Recovery incomplete; monitoring',exhausted:'Recovery limit reached',detached:'Awaiting device connection',limited:'Awaiting cellular connectivity'};
+function metric(id,value,suffix=''){
+    const node=$(id),valid=Number.isFinite(value)&&value>=0;
+    node.classList.toggle('unavailable',!valid);
+    if(!valid){node.textContent='Unavailable';return}
+    const units=['B','KB','MB','GB','TB'];let i=0;
+    while(value>=1024&&i<units.length-1){value/=1024;i++}
+    node.innerHTML=value.toFixed(i?1:0)+'<span class="unit">'+units[i]+suffix+'</span>';
+}
+function offline(message){
+    globe.setSpinning(false);
+    $('dashboard').dataset.stale='true';$('stale-note').hidden=lastStamp===null;
+    $('state').textContent=message;
+    $('dot').style.background='#778294';$('dot').classList.remove('blink');$('updated').textContent='Status not updated';
+    metric('down-speed',null);metric('up-speed',null);
+}
+async function refresh(){
+    const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),4000);
+    try{
+        const response=await fetch('status.json',{cache:'no-store',signal:controller.signal});
+        if(!response.ok)throw Error('unavailable');
+        const d=await response.json(),now=Date.now();
+        if(!Number.isFinite(d.updated_uptime)||typeof d.led!=='string')throw Error('invalid status');
+        if(d.updated_uptime!==lastStamp){lastStamp=d.updated_uptime;lastAdvance=now}
+        if(now-lastAdvance>6000){offline('STATUS STALE');return}
+        let status=labels[d.state]||labels.checking;
+        if(d.state==='limited'){
+            if(d.led.startsWith('green'))status=d.led.endsWith('_blink')?'4G WEAK':'4G AVAILABLE';
+            else if(d.led.startsWith('yellow'))status=d.led.endsWith('_blink')?'2G/3G WEAK':'2G/3G AVAILABLE';
+        }
+        if(d.state==='radio_fault'&&d.led==='red_solid')status='NO SIM';
+        $('dashboard').dataset.stale='false';$('stale-note').hidden=true;
+        $('state').textContent=status;
+        $('dot').style.background=d.led.startsWith('blue')?'#155fea':d.led.startsWith('red')?'#ef7972':d.led.startsWith('yellow')?'#e8c45c':d.led.startsWith('green')?'#4bc49a':'#778294';
+        $('dot').classList.toggle('blink',d.led.endsWith('_blink'));
+        globe.setSpinning(/^(green|blue)_(solid|blink)$/.test(d.led));
+        $('updated').textContent='Just updated';
+        metric('down-speed',d.download_Bps,'/s');metric('up-speed',d.upload_Bps,'/s');
+        metric('down-total',d.download_bytes);metric('up-total',d.upload_bytes);
+        $('radio').textContent=d.network_type&&d.network_type!=='unknown'?d.network_type:'Unavailable';
+        $('signal').textContent=Number.isFinite(d.signal_dbm)?d.signal_dbm+' dBm':'Unavailable';
+        $('peer').textContent=d.device_ip||'Unconfirmed';$('local').textContent=d.local_ip||'Unavailable';$('cell').textContent=d.cellular_ip||'Unavailable';
+        $('duration').textContent=Number.isFinite(d.session_seconds)&&d.session_seconds>=0?Math.floor(d.session_seconds/3600)+' h '+Math.floor(d.session_seconds/60)%60+' min':'Unavailable';
+        $('recovery').textContent=phases[d.recovery_mode]||'Monitoring';
+        $('attempts').textContent='This boot: '+(d.recovery_attempts||0)+' / 3 attempts';
+        $('version').textContent=d.version||'1.1.0';
+        $('notice').textContent=d.session_uncertain?'Connection changed during recovery. Usage continuity is unconfirmed.':d.discontinuities?'The connection or counters changed. Usage totals may be incomplete.':d.led_control?'':'LEDs are currently controlled by the factory service.';
+    }catch{offline('MODULE OFFLINE')}
+    finally{clearTimeout(deadline);setTimeout(refresh,1500)}
+}
+document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden&&Date.now()-lastAdvance>6000)offline('UPDATING');
+    globe.visibilityChanged();
+});
+refresh();
+</script>
+</body>
+</html>

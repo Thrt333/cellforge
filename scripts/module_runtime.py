@@ -66,8 +66,11 @@ def stage(dev):
         manifest[name] = expected
     for name in ("cellforge.sh", "recovery-worker.sh", "auto-recover.sh"):
         run(dev, "sh -n " + target + "/" + name)
+    # Persist the complete payload before selecting it for the next boot.
+    run(dev, "sync")
     # A running service must be stopped explicitly before changing its files.
     run(dev, "test ! -f /tmp/cellforge/current && ln -sfn releases/" + revision + " " + REMOTE + "/current")
+    run(dev, "sync")
     return {"revision": revision, "path": target, "files": manifest}
 
 

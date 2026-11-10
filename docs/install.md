@@ -1,9 +1,9 @@
-# Install Cellforge 1.0.0 from source
+# Install Cellforge 1.1.0 from source
 
 Cellforge installs a small service and dashboard inside the existing factory
 firmware. It does not flash a firmware image or install a resident Mac app. There is
-no separate installation package. Use the source at tag `v1.0.0` from the [GitHub
-Release](https://github.com/Thrt333/cellforge/releases/tag/v1.0.0).
+no separate installation package. Use the source at tag `v1.1.0` from the [GitHub
+Release](https://github.com/Thrt333/cellforge/releases/tag/v1.1.0).
 
 ## Supported installation boundary
 
@@ -28,7 +28,7 @@ Windows/Linux installers are not provided.
 Download and extract the source ZIP from the Release, or use Git:
 
 ```sh
-git clone --branch v1.0.0 --single-branch https://github.com/Thrt333/cellforge.git
+git clone --branch v1.1.0 --single-branch https://github.com/Thrt333/cellforge.git
 cd cellforge
 ```
 
@@ -74,9 +74,10 @@ python3 -B scripts/module_runtime.py probe
 ```
 
 Run each command separately and continue only after success. `stage` uploads eight
-fixed files, verifies SHA-256 hashes and selects the immutable payload via
-`/data/cellforge/current`. For the 1.0.0 source, the payload identifier is
-`de31653675b5a757`. A different result requires investigation, not blind activation.
+fixed files, verifies SHA-256 hashes, flushes the complete payload, selects it via
+`/data/cellforge/current`. For the 1.1.0 source, the payload identifier is
+`630ff04b2567dd24`. The release selection is also flushed before success is
+reported. A different result requires investigation, not blind activation.
 
 `start` launches the supervised service. `status` reports process/control state;
 `probe` reads its current dashboard JSON. Neither alone proves the terminal's
@@ -148,7 +149,8 @@ uninstaller. Data removal needs an exact, separately reviewed candidate list.
 Neither operation revokes ADB authorization or restores USB composition. Manual
 unplug/reconnect working is not proof of complete uninstall or debug reversal. Do not
 use ECM disablement as an internet-flow switch: mode 0 selects QMI and can remove the
-Mac Ethernet connection. The dashboard traffic switch is 1.1.0 work.
+Mac Ethernet connection. Dashboard traffic selection remains deferred and is not
+included in this release.
 
 For failure investigation:
 
@@ -157,10 +159,10 @@ python3 -B scripts/module_runtime.py logs
 ```
 
 Keep logs local and sanitize before sharing. Read the [release evidence and
-limits](cellforge-1.0.0-validation.md): one iPad lock/unlock success is
+limits](cellforge-1.1.0-validation.md): one iPad lock/unlock success is
 field-reported; Mac actual system-sleep recovery and broad mobile compatibility are
-not established. No new module write or acceptance test was performed while preparing
-this guide.
+not established. Current release checks and module observations are recorded in the
+1.1.0 verification record and GitHub Release notes.
 
 ## Verify a source checkout
 

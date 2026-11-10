@@ -1,6 +1,6 @@
 # Cellforge
 
-Version: **1.0.0**. Delivery: version tag + GitHub Release + source installation. See
+Version: **1.1.0**. Delivery: version tag + GitHub Release + source installation. See
 the [installation guide](docs/install.md), [changelog](CHANGELOG.md) and [source
 verification](docs/install.md#verify-a-source-checkout). No separate installer
 package or custom firmware image is provided.
@@ -33,9 +33,10 @@ Connect the module and open **http://192.168.225.1:8080/**. The service starts
 automatically after boot. See the [service guide](docs/module-service.md) for
 behavior, installed paths, stop/start, handback and evidence limits.
 
-Host policy tests pass; see the [1.0.0 verification
-record](docs/cellforge-1.0.0-validation.md). An initial ADB-bit attempt failed exact
-readback without a restart. The subsequent [legacy authorization
+The Dashboard now provides a refreshed responsive layout, clearer connection status,
+stable speed alignment and revised visual styling. See the [1.1.0 verification
+record](docs/cellforge-1.1.0-validation.md) for current scope and checks. An initial
+ADB-bit attempt failed exact readback without a restart. The subsequent [legacy authorization
 transaction](docs/legacy-adb-transaction.md) succeeded on this unit: exact
 post-restart USB composition and real ADB root access were verified. See the [module
 runtime baseline](docs/module-runtime-baseline.md). Deployment, independent crash
@@ -46,7 +47,7 @@ validation record for the current evidence boundary.
 
 ## Source installation
 
-Follow [the installation guide](docs/install.md) from the `v1.0.0` source.
+Follow [the installation guide](docs/install.md) from the `v1.1.0` source.
 Installation uses a Mac as the USB control host, with Python, existing libusb, the
 exact supported firmware, ECM and root ADB access. It does not install a resident Mac
 application. Once installed, the module works independently. Fresh installation on
@@ -117,7 +118,7 @@ tested model/OS combination.
 3. Measure resource use, accounting continuity and factory handback during
    repeated connection and lock cycles.
 4. Revisit Mac actual system-sleep recovery and remaining hardware evidence in
-   later work; design the dashboard traffic switch for 1.1.0 separately.
+   later work; revisit dashboard traffic selection separately.
 
 The first version excludes SMS, calls, eSIM management and a resident Mac management
 application. There is no decision to fork the full DJOneHub platform.
